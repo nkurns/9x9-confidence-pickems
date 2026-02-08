@@ -62,7 +62,9 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
+      import { API_URL } from "./src/config.js";
+
       document.addEventListener("DOMContentLoaded", () => {
         const registerForm = document.getElementById("registerForm");
         const errorMessages = {
@@ -90,7 +92,7 @@
 
           try {
             const response = await fetch(
-              "http://localhost:3333/api/auth/register",
+              `${API_URL}/api/auth/register`,
               {
                 method: "POST",
                 headers: {
