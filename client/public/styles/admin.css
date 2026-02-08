@@ -1,0 +1,429 @@
+/* ===========================================
+   ADMIN PAGE STYLES
+   =========================================== */
+
+.admin-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+/* Pool Selector */
+.pool-selector {
+  margin-top: var(--spacing-md);
+}
+
+.pool-selector label {
+  font-weight: 500;
+  color: var(--color-text-light);
+  margin-right: var(--spacing-sm);
+}
+
+.pool-selector select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  background: var(--color-white);
+  color: var(--color-text);
+  min-width: 200px;
+}
+
+.pool-selector select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Admin Section Card */
+.admin-section {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.admin-section h2 {
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-xl);
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: var(--spacing-sm);
+}
+
+.admin-section h3 {
+  color: var(--color-text-light);
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-base);
+}
+
+/* Section Divider */
+.section-divider {
+  border-top: 1px solid var(--color-border);
+  margin: var(--spacing-xl) 0;
+  padding-top: var(--spacing-lg);
+}
+
+.section-divider h2 {
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Games List */
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Game Card */
+.game-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+}
+
+.game-card.complete {
+  background: #f0fff4;
+  border-color: #9ae6b4;
+}
+
+.game-card .game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.game-card .game-title {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+}
+
+.game-card .game-status {
+  font-size: var(--font-size-sm);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.game-card .game-status.pending {
+  background: var(--color-warning-light);
+  color: #975a16;
+}
+
+.game-card .game-status.complete {
+  background: var(--color-success-light);
+  color: #276749;
+}
+
+.game-card .game-info {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.game-card .game-teams {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.game-card .game-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+}
+
+/* Team Option Buttons */
+.team-option {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: center;
+  font-weight: 500;
+  font-size: var(--font-size-base);
+  transition: all 0.2s;
+}
+
+.team-option:hover {
+  border-color: var(--color-primary);
+  background: var(--color-background);
+}
+
+.team-option.selected {
+  border-color: var(--color-success);
+  background: #f0fff4;
+  color: #276749;
+}
+
+.team-option.winner {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+  color: #276749;
+}
+
+.team-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.vs-divider {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Pool Settings */
+.pool-settings {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.pool-settings h2 {
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-xl);
+}
+
+.settings-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.settings-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-sm);
+}
+
+/* Admin Form Group Overrides */
+.admin-section .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-section .form-group input,
+.admin-section .form-group select {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  background: var(--color-white);
+}
+
+.admin-section .form-group input:focus,
+.admin-section .form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.admin-section .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Participants */
+.participants-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.participants-list {
+  background: var(--color-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+}
+
+.participant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+}
+
+.participant-item .name {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.participant-item .email {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.participant-item .picks-status {
+  font-size: var(--font-size-xs);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.participant-item .picks-status.complete {
+  background: var(--color-success-light);
+  color: #276749;
+}
+
+.participant-item .picks-status.pending {
+  background: var(--color-warning-light);
+  color: #975a16;
+}
+
+/* Proxy Picks */
+.proxy-picks-form {
+  margin-top: var(--spacing-lg);
+}
+
+.proxy-game-item {
+  background: var(--color-background);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+}
+
+.proxy-game-item .game-title {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.proxy-game-item .game-matchup {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.proxy-game-item .pick-row {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.proxy-game-item .team-select {
+  flex: 1;
+}
+
+.proxy-game-item .points-select {
+  width: 100px;
+}
+
+.proxy-game-item select {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+/* Completed game styles in proxy picks */
+.proxy-game-item.complete {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: 4px;
+}
+
+.proxy-game-item.complete .game-title {
+  font-size: var(--font-size-sm);
+  margin-bottom: 0;
+  display: inline;
+}
+
+.proxy-game-item.complete .game-matchup {
+  display: inline;
+  margin-left: 8px;
+  margin-bottom: 0;
+}
+
+.proxy-game-item.complete.correct {
+  background: #f0fff4;
+  border-color: #9ae6b4;
+}
+
+.proxy-game-item.complete.incorrect {
+  background: #fff5f5;
+  border-color: #feb2b2;
+}
+
+.proxy-game-item .game-status-badge {
+  font-size: 10px;
+  background: #68d391;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+.proxy-game-item .pick-row.locked {
+  background: transparent;
+  margin-top: 4px;
+}
+
+.proxy-game-item .locked-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0;
+  font-size: var(--font-size-sm);
+}
+
+.proxy-game-item .locked-pick .pick-team {
+  font-weight: 600;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.proxy-game-item .locked-pick .pick-points-display {
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.proxy-game-item .locked-pick .pick-result {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.proxy-game-item .locked-pick .pick-result.correct {
+  color: #276749;
+}
+
+.proxy-game-item .locked-pick .pick-result.incorrect {
+  color: #c53030;
+}
+
+/* Add Game Form */
+.add-game-form {
+  margin-top: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .participants-container {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-section .form-row {
+    grid-template-columns: 1fr;
+  }
+}

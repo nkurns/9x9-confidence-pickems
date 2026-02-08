@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>9X9 NFL Playoff Pool - Register</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/register.css" />
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="register-container">
+      <div class="register-card">
+        <div class="register-header">
+          <h2>Create Account</h2>
+          <p>Join the 9X9 NFL Playoff Pool community</p>
+        </div>
+
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="displayName">Display Name</label>
+            <input
+              type="text"
+              id="displayName"
+              name="displayName"
+              required
+              minlength="2"
+              placeholder="How you'll appear in standings"
+            />
+            <div class="error-message" id="displayNameError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="your@email.com" />
+            <div class="error-message" id="emailError"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              minlength="6"
+              placeholder="At least 6 characters"
+            />
+            <div class="error-message" id="passwordError"></div>
+          </div>
+
+          <button type="submit" class="submit-button">Create Account</button>
+        </form>
+
+        <div class="login-link">
+          Already have an account? <a href="login.html">Log in</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const registerForm = document.getElementById("registerForm");
+        const errorMessages = {
+          displayName: document.getElementById("displayNameError"),
+          email: document.getElementById("emailError"),
+          password: document.getElementById("passwordError"),
+        };
+
+        registerForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          // Reset error messages
+          Object.values(errorMessages).forEach((el) => {
+            if (el) {
+              el.style.display = "none";
+              el.textContent = "";
+            }
+          });
+
+          const formData = {
+            displayName: document.getElementById("displayName").value,
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value,
+          };
+
+          try {
+            const response = await fetch(
+              "http://localhost:3333/api/auth/register",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+              }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("user", JSON.stringify(data.user));
+              sessionStorage.setItem("justRegistered", "true");
+              window.location.href = "index.html";
+            } else {
+              // Show specific error messages
+              if (data.errors) {
+                Object.keys(data.errors).forEach((field) => {
+                  if (errorMessages[field]) {
+                    errorMessages[field].textContent = data.errors[field];
+                    errorMessages[field].style.display = "block";
+                  }
+                });
+              } else {
+                errorMessages.email.textContent = data.message;
+                errorMessages.email.style.display = "block";
+              }
+            }
+          } catch (error) {
+            console.error("Registration error:", error);
+            errorMessages.email.textContent =
+              "An error occurred during registration. Please try again.";
+            errorMessages.email.style.display = "block";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

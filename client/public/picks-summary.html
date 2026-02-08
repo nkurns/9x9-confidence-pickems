@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>9X9 NFL Playoff Pool - View Picks</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/picks.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="picks-container">
+      <div class="page-header">
+        <h1>View Picks</h1>
+        <p id="poolName" class="pool-subtitle">Loading pool...</p>
+      </div>
+      <div class="picks-table-container">
+        <table class="picks-table">
+          <thead>
+            <tr id="headerRow">
+              <th>Game</th>
+              <!-- Participant columns will be added dynamically -->
+            </tr>
+          </thead>
+          <tbody id="picksTableBody">
+            <!-- Game rows will be added dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+      import { getAvatarHtml, getInitials, getAvatarColor } from "./src/profileHelpers.js";
+      import { getTeamLogoUrl } from "./src/teamLogos.js";
+
+      // Add navbar initialization
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          await loadNavbar();
+
+          if (!auth.isAuthenticated()) {
+            window.location.href = "/";
+            return;
+          }
+
+          const token = localStorage.getItem("token");
+
+          // Get active pool
+          const poolResponse = await fetch(`${API_URL}/api/pool/active`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!poolResponse.ok) {
+            throw new Error("Failed to fetch pool data");
+          }
+
+          const activePool = await poolResponse.json();
+          const poolName = document.getElementById("poolName");
+          if (poolName) {
+            poolName.textContent = activePool.name;
+          }
+
+          // Get picks summary
+          const summaryResponse = await fetch(`${API_URL}/api/picks/summary`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!summaryResponse.ok) {
+            throw new Error("Failed to fetch picks summary");
+          }
+
+          const summary = await summaryResponse.json();
+          console.log("Summary Data:", summary);
+
+          // Use pickers from summary (includes participants + their kids who have picks)
+          const pickers = summary.pickers || [];
+          console.log("Pickers:", pickers);
+
+          if (pickers.length === 0) {
+            document.getElementById("poolName").textContent +=
+              " (No picks submitted yet)";
+            return;
+          }
+
+          // Reorder pickers to put current user first, then their kids, then others
+          const currentUser = JSON.parse(localStorage.getItem("user"));
+          const orderedPickers = [
+            // Current user first
+            ...pickers.filter((p) => p.participantId === currentUser.id && !p.isDependent),
+            // Current user's kids
+            ...pickers.filter((p) => p.participantId === currentUser.id && p.isDependent),
+            // Other participants (non-dependents first)
+            ...pickers.filter((p) => p.participantId !== currentUser.id && !p.isDependent),
+            // Other dependents
+            ...pickers.filter((p) => p.participantId !== currentUser.id && p.isDependent),
+          ];
+
+          // 1. Add picker avatars and names to header row
+          const headerRow = document.getElementById("headerRow");
+          orderedPickers.forEach((picker) => {
+            const th = document.createElement("th");
+            th.className = "user-pick participant-header";
+            // Highlight current user's column (self only, not their kids)
+            if (picker.participantId === currentUser.id && !picker.isDependent) {
+              th.classList.add("current-user");
+            }
+
+            // For dependents (kids), show a simpler display
+            let displayHtml;
+            if (picker.isDependent) {
+              displayHtml = `
+                <div class="participant-avatar-wrapper">
+                  <div class="avatar-initials" style="width: 40px; height: 40px; font-size: 14px; background-color: ${getAvatarColor(picker.displayName)}; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: white;">
+                    ${getInitials(picker.displayName)}
+                  </div>
+                </div>
+                <span class="participant-name">${picker.displayName}</span>
+                <span class="participant-parent">(${picker.parentName}'s kid)</span>
+              `;
+            } else {
+              displayHtml = `
+                <div class="participant-avatar-wrapper">
+                  ${getAvatarHtml(picker, 40)}
+                </div>
+                <span class="participant-name">${picker.displayName}</span>
+              `;
+            }
+            th.innerHTML = displayHtml;
+            headerRow.appendChild(th);
+          });
+
+          // 2. Add game rows with picks
+          const tableBody = document.getElementById("picksTableBody");
+          summary.games.forEach((game) => {
+            const row = document.createElement("tr");
+
+            // Game matchup cell with title and teams
+            const matchupCell = document.createElement("td");
+            matchupCell.className = "game-matchup";
+            matchupCell.innerHTML = `
+              <div class="game-title">${game.gameTitle || game.round}</div>
+              <div class="game-teams">${game.awayTeam} @ ${game.homeTeam}</div>
+            `;
+            row.appendChild(matchupCell);
+
+            // Add pick cells for each picker
+            orderedPickers.forEach((picker) => {
+              const pickCell = document.createElement("td");
+              pickCell.className = "user-pick";
+              // Highlight current user's column (self only)
+              if (picker.participantId === currentUser.id && !picker.isDependent) {
+                pickCell.classList.add("current-user");
+              }
+
+              const pick = game.picks[picker.pickerId];
+              if (pick) {
+                pickCell.innerHTML = `
+                  <div class="pick-content">
+                    <img src="${getTeamLogoUrl(pick.selectedTeam)}" alt="${pick.selectedTeam}" class="pick-team-logo" title="${pick.selectedTeam}">
+                    <span class="pick-points">${pick.confidencePoints}</span>
+                  </div>
+                `;
+                // Only apply correct/incorrect styling if the game result has been entered
+                if (pick.isCorrect === true) {
+                  pickCell.classList.add("correct");
+                } else if (pick.isCorrect === false) {
+                  pickCell.classList.add("incorrect");
+                }
+              } else {
+                pickCell.className += " not-posted";
+                pickCell.innerHTML = `<span class="no-pick">—</span>`;
+              }
+              row.appendChild(pickCell);
+            });
+
+            tableBody.appendChild(row);
+          });
+
+          // Update the styles
+          const style = document.createElement("style");
+          style.textContent = `
+            .picks-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+              table-layout: fixed;
+            }
+
+            .picks-table th,
+            .picks-table td {
+              padding: 6px 8px;
+              text-align: center;
+              border: 1px solid #e2e8f0;
+              width: 80px;
+            }
+
+            .picks-table th:first-child,
+            .picks-table td:first-child {
+              width: 140px;
+              min-width: 140px;
+            }
+
+            .picks-table thead th {
+              background-color: #f7fafc;
+              font-weight: 600;
+            }
+
+            #headerRow th {
+              background-color: #edf2f7;
+              font-size: 1.1em;
+              text-align: center;
+            }
+
+            .user-pick.current-user,
+            td.user-pick.current-user {
+              background-color: #f7fafc;
+            }
+
+            .game-matchup {
+              text-align: center;
+            }
+
+            .game-matchup .game-title {
+              font-weight: 600;
+              color: #2d3748;
+              font-size: 0.9em;
+            }
+
+            .game-matchup .game-teams {
+              color: #718096;
+              font-size: 0.85em;
+              margin-top: 2px;
+            }
+
+            .participant-header {
+              vertical-align: bottom;
+              padding-bottom: 8px !important;
+            }
+
+            .participant-avatar-wrapper {
+              display: flex;
+              justify-content: center;
+              margin-bottom: 6px;
+            }
+
+            .participant-name {
+              display: block;
+              font-size: 0.85em;
+              font-weight: 600;
+            }
+
+            .participant-parent {
+              display: block;
+              font-size: 0.7em;
+              font-weight: 400;
+              color: #718096;
+            }
+
+            .pick-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 2px;
+            }
+
+            .pick-team-logo {
+              width: 32px;
+              height: 32px;
+              object-fit: contain;
+            }
+
+            .pick-points {
+              font-size: 1.4em;
+              font-weight: 700;
+              color: #6b46c1;
+            }
+
+            .user-pick.correct,
+            .user-pick.current-user.correct {
+              background-color: #c6f6d5;
+            }
+
+            .user-pick.correct .pick-points {
+              color: #276749;
+            }
+
+            .user-pick.incorrect,
+            .user-pick.current-user.incorrect {
+              background-color: #fed7d7;
+            }
+
+            .user-pick.incorrect .pick-points {
+              color: #c53030;
+            }
+
+            .user-pick.not-posted {
+              color: #a0aec0;
+            }
+
+            .no-pick {
+              color: #cbd5e0;
+              font-size: 1.2em;
+            }
+          `;
+          document.head.appendChild(style);
+        } catch (error) {
+          console.error("Error loading picks summary:", error);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Select Pools - 9X9 Playoff Pools</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/select-pools.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="pools-container">
+      <div class="pools-header">
+        <h1>Available Pools</h1>
+        <p>Select the pools you'd like to join for the playoffs</p>
+      </div>
+
+      <form id="poolsForm" onsubmit="handlePoolSubmit(event)">
+        <div id="poolsList" class="pools-list">
+          <!-- Pools will be loaded here dynamically -->
+          <div class="no-pools">Loading available pools...</div>
+        </div>
+
+        <div class="submit-container">
+          <button type="submit" class="join-button" id="joinButton" disabled>
+            Join Selected Pools
+          </button>
+        </div>
+      </form>
+
+      <div class="section-divider">
+        <span>OR</span>
+      </div>
+
+      <div class="create-pool-section">
+        <h2>Create Your Own Pool</h2>
+        <p>Start a new pool and invite your friends and family to join!</p>
+
+        <div id="createSuccess" class="success-message"></div>
+
+        <form id="createPoolForm" onsubmit="handleCreatePool(event)">
+          <div class="form-row">
+            <label for="poolName">Pool Name</label>
+            <input type="text" id="poolName" placeholder="e.g., Family Playoff Pool 2026" required minlength="3" />
+          </div>
+
+          <div class="form-row">
+            <label for="totalGames">Number of Games</label>
+            <input type="number" id="totalGames" value="13" min="1" max="20" required />
+            <small style="color: #718096; margin-top: 4px; display: block;">NFL Playoffs = 13 games</small>
+          </div>
+
+          <div class="date-row">
+            <div class="form-row">
+              <label for="startDate">Start Date</label>
+              <input type="date" id="startDate" required />
+            </div>
+            <div class="form-row">
+              <label for="endDate">End Date</label>
+              <input type="date" id="endDate" required />
+            </div>
+          </div>
+
+          <button type="submit" class="create-button">Create Pool</button>
+        </form>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+
+      let selectedPools = new Set();
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        await loadNavbar();
+
+        // Verify authentication
+        if (!auth.isAuthenticated()) {
+          window.location.href = "/";
+          return;
+        }
+
+        try {
+          console.log("Fetching available pools...");
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/pools/available`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          console.log("Response status:", response.status);
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to fetch pools");
+          }
+
+          const pools = await response.json();
+
+          if (!pools || !Array.isArray(pools)) {
+            throw new Error("Invalid pools data received");
+          }
+
+          displayPools(pools);
+        } catch (error) {
+          console.error("Error fetching pools:", error);
+          document.getElementById("poolsList").innerHTML = `
+            <div class="error-message">
+              Error loading pools. Please try again later.<br>
+              <small>${error.message}</small>
+            </div>
+          `;
+        }
+      });
+
+      function displayPools(pools) {
+        const poolsList = document.getElementById("poolsList");
+        const joinButton = document.getElementById("joinButton");
+
+        if (!pools || pools.length === 0) {
+          poolsList.innerHTML = `
+            <div class="no-pools">
+              <p>No pools are currently available to join.</p>
+            </div>
+          `;
+          return;
+        }
+
+        poolsList.innerHTML = pools
+          .map(
+            (pool) => `
+            <div class="pool-card">
+              <input
+                type="checkbox"
+                id="pool-${pool._id}"
+                class="pool-checkbox"
+                value="${pool._id}"
+                onchange="handlePoolSelection(event)"
+              />
+              <div class="pool-info">
+                <div class="pool-name">${pool.name}</div>
+                <div class="pool-details">
+                  <div class="pool-detail">
+                    <i class="fas fa-users"></i>
+                    <span>${pool.participantCount || 0} Participants</span>
+                  </div>
+                  <div class="pool-detail">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>${pool.entryFee ? `$${pool.entryFee}` : "Free"}</span>
+                  </div>
+                  <div class="pool-detail">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Starts: ${new Date(
+                      pool.startDate
+                    ).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `
+          )
+          .join("");
+
+        // Enable/disable join button based on selection
+        joinButton.disabled = true;
+      }
+
+      // Make these functions available globally
+      window.handlePoolSelection = function (event) {
+        const poolId = event.target.value;
+        const joinButton = document.getElementById("joinButton");
+
+        if (event.target.checked) {
+          selectedPools.add(poolId);
+        } else {
+          selectedPools.delete(poolId);
+        }
+
+        joinButton.disabled = selectedPools.size === 0;
+      };
+
+      window.handlePoolSubmit = async function (event) {
+        event.preventDefault();
+        const joinButton = document.getElementById("joinButton");
+        joinButton.disabled = true;
+
+        try {
+          // Join each selected pool
+          const joinPromises = Array.from(selectedPools).map((poolId) =>
+            fetch(`${API_URL}/api/pools/${poolId}/join`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            })
+          );
+
+          await Promise.all(joinPromises);
+
+          // Update user's pool participation status
+          const user = JSON.parse(localStorage.getItem("user"));
+          user.hasPoolParticipation = true;
+          localStorage.setItem("user", JSON.stringify(user));
+
+          // Redirect to dashboard
+          window.location.href = "/";
+        } catch (error) {
+          console.error("Error joining pools:", error);
+          alert("Failed to join pools. Please try again.");
+          joinButton.disabled = false;
+        }
+      };
+
+      window.handleCreatePool = async function (event) {
+        event.preventDefault();
+
+        const poolName = document.getElementById("poolName").value;
+        const totalGames = parseInt(document.getElementById("totalGames").value);
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const submitButton = event.target.querySelector("button[type='submit']");
+
+        // Validate dates
+        if (new Date(endDate) <= new Date(startDate)) {
+          alert("End date must be after start date");
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Creating...";
+
+        try {
+          // Create the pool
+          const response = await fetch(`${API_URL}/api/pools`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: poolName,
+              totalGames: totalGames,
+              startDate: new Date(startDate).toISOString(),
+              endDate: new Date(endDate).toISOString(),
+            }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to create pool");
+          }
+
+          const newPool = await response.json();
+
+          // Auto-join the pool we just created
+          await fetch(`${API_URL}/api/pools/${newPool._id}/join`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          // Update user's pool participation status
+          const user = JSON.parse(localStorage.getItem("user"));
+          user.hasPoolParticipation = true;
+          localStorage.setItem("user", JSON.stringify(user));
+
+          // Show success message
+          const successDiv = document.getElementById("createSuccess");
+          successDiv.textContent = `Pool "${poolName}" created successfully! Redirecting...`;
+          successDiv.style.display = "block";
+
+          // Redirect to dashboard after a short delay
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1500);
+
+        } catch (error) {
+          console.error("Error creating pool:", error);
+          alert("Failed to create pool: " + error.message);
+          submitButton.disabled = false;
+          submitButton.textContent = "Create Pool";
+        }
+      };
+
+      // Set default dates (today and 2 weeks from now)
+      document.addEventListener("DOMContentLoaded", () => {
+        const today = new Date();
+        const twoWeeksLater = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+        document.getElementById("startDate").value = today.toISOString().split("T")[0];
+        document.getElementById("endDate").value = twoWeeksLater.toISOString().split("T")[0];
+      });
+    </script>
+  </body>
+</html>

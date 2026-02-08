@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>9X9 NFL Playoff Pool - Make Picks</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/picks.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="picks-container">
+      <div class="page-header">
+        <h1 id="pageTitle">Make Your Picks</h1>
+        <p id="poolName" class="pool-subtitle">Loading pool...</p>
+      </div>
+
+      <!-- Picker Selector (for self or dependents) -->
+      <div id="pickerSelector" class="picker-selector" style="display: none;">
+        <label for="pickingFor">Making picks for:</label>
+        <select id="pickingFor">
+          <option value="">Myself</option>
+          <!-- Dependents will be added here dynamically -->
+        </select>
+      </div>
+
+      <div id="games-container" class="games-container">
+        <!-- Game cards will be dynamically inserted here -->
+      </div>
+      <button id="submit-all-button" class="submit-button">Lock 'Em In!</button>
+
+      <div class="your-picks-section" style="display: none;">
+        <h3>Your Previous Picks</h3>
+        <div class="picks-list">
+          <!-- Picks will be added here dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+      import { getTeamLogoUrl } from "./src/teamLogos.js";
+
+      // Declare global variables
+      let currentUser = null;
+      let token = null;
+      let currentPool = null;
+      let existingPicks = [];
+      let gamesContainer = null;
+      let dependents = [];
+      let selectedDependentId = null; // null = picking for self
+
+      // Make API_URL and helper functions available globally
+      window.API_URL = API_URL;
+      window.token = token;
+      window.currentPool = currentPool;
+      window.existingPicks = existingPicks;
+      window.getTeamLogoUrl = getTeamLogoUrl;
+      window.selectedDependentId = selectedDependentId;
+
+      async function loadExistingPicks() {
+        try {
+          console.log("Current user:", currentUser);
+          console.log("Token:", token ? "Present" : "Missing");
+
+          if (!currentUser || !currentUser.id) {
+            throw new Error("Invalid user data");
+          }
+
+          // First get the active pool
+          const poolResponse = await fetch(`${API_URL}/api/pools/active`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          const responseData = await poolResponse.json();
+          console.log("Pool response:", JSON.stringify(responseData, null, 2));
+
+          if (!poolResponse.ok) {
+            if (poolResponse.status === 401) {
+              // Token expired or invalid
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              window.location.href = "/login.html";
+              return;
+            }
+            throw new Error(
+              responseData.message ||
+                responseData.error ||
+                "Failed to fetch active pool"
+            );
+          }
+
+          currentPool = responseData;
+          window.currentPool = currentPool; // Update global reference
+          console.log("Current pool set to:", currentPool);
+
+          // Update pool name subtitle
+          const poolName = document.getElementById("poolName");
+          if (poolName) {
+            poolName.textContent = currentPool.name;
+          }
+
+          // Then get picks for this pool (include dependentId if picking for dependent)
+          const picksUrl = selectedDependentId
+            ? `${API_URL}/api/picks/pool/${currentPool._id}?dependentId=${selectedDependentId}`
+            : `${API_URL}/api/picks/pool/${currentPool._id}`;
+
+          const picksResponse = await fetch(picksUrl, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (picksResponse.status === 404) {
+            // No picks found - that's okay, we'll show the make picks interface
+            console.log("No existing picks found");
+            existingPicks = [];
+            window.existingPicks = [];
+            window.existingPickGameIds = new Set(); // Clear so all games show
+
+            // Hide the "Your Previous Picks" section since there are none
+            const yourPicksSection = document.querySelector(".your-picks-section");
+            yourPicksSection.style.display = "none";
+            document.querySelector(".picks-list").innerHTML = "";
+            return;
+          }
+
+          if (!picksResponse.ok) {
+            const picksError = await picksResponse.json();
+            console.error("Picks response error:", picksError);
+            throw new Error(picksError.message || "Failed to fetch picks");
+          }
+
+          const picks = await picksResponse.json();
+          existingPicks = picks;
+          window.existingPicks = existingPicks; // Update global reference
+          console.log("Loaded existing picks:", existingPicks);
+
+          // Show existing picks in the Your Picks section
+          if (existingPicks.length > 0) {
+            const yourPicksSection = document.querySelector(
+              ".your-picks-section"
+            );
+            const picksList = document.querySelector(".picks-list");
+            picksList.innerHTML = ""; // Clear existing content
+
+            // Sort picks by round (later rounds at top)
+            const roundOrder = { "Wild Card": 1, "Divisional": 2, "Conference": 3, "Super Bowl": 4 };
+            existingPicks.sort((a, b) => {
+              const roundDiff = (roundOrder[b.round] || 0) - (roundOrder[a.round] || 0);
+              if (roundDiff !== 0) return roundDiff;
+              // Within same round, sort by game title
+              return a.gameTitle.localeCompare(b.gameTitle);
+            });
+
+            existingPicks.forEach((pick) => {
+              const pickItem = document.createElement("div");
+              const isComplete = pick.isComplete;
+              const isCorrect = pick.isCorrect;
+
+              // Add classes based on game status
+              let itemClasses = "pick-item";
+              if (isComplete) {
+                itemClasses += isCorrect ? " correct" : " incorrect";
+              }
+              pickItem.className = itemClasses;
+
+              // Format teams display
+              const teamsDisplay = `${pick.awayTeam} @ ${pick.homeTeam}`;
+
+              // Result indicator for completed games
+              let resultIndicator = "";
+              if (isComplete) {
+                if (isCorrect) {
+                  resultIndicator = `<span class="pick-result correct">✓</span>`;
+                } else {
+                  resultIndicator = `<span class="pick-result incorrect">✗</span>`;
+                }
+              }
+
+              pickItem.innerHTML = `
+                <div class="pick-game-info">
+                  <span class="pick-game-title">${pick.gameTitle || "Game"}</span>
+                  <span class="pick-teams">${teamsDisplay}</span>
+                </div>
+                <span class="pick-team-selected">${pick.selectedTeam}${resultIndicator}</span>
+                <span class="pick-points">${pick.confidencePoints} pts</span>
+              `;
+              picksList.appendChild(pickItem);
+            });
+
+            yourPicksSection.style.display = "block";
+          }
+
+          // Store existing pick game IDs for filtering
+          window.existingPickGameIds = new Set(existingPicks.map(p => p.gameId));
+        } catch (error) {
+          console.error("Error loading existing picks:", error);
+          throw error;
+        }
+      }
+
+      async function loadDependents() {
+        try {
+          const response = await fetch(`${API_URL}/api/participants/dependents`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.log("No dependents or error fetching");
+            return;
+          }
+
+          dependents = await response.json();
+          window.dependents = dependents;
+
+          // If user has dependents, show the picker selector
+          if (dependents.length > 0) {
+            const selector = document.getElementById("pickerSelector");
+            const select = document.getElementById("pickingFor");
+
+            // Add dependent options
+            dependents.forEach(dep => {
+              const option = document.createElement("option");
+              option.value = dep._id;
+              option.textContent = dep.displayName;
+              select.appendChild(option);
+            });
+
+            selector.style.display = "flex";
+
+            // Handle picker change
+            select.addEventListener("change", async (e) => {
+              selectedDependentId = e.target.value || null;
+              window.selectedDependentId = selectedDependentId;
+
+              // Update page title to show who you're picking for
+              const pageTitle = document.getElementById("pageTitle");
+              if (selectedDependentId) {
+                const dep = dependents.find(d => d._id === selectedDependentId);
+                pageTitle.textContent = `Make Picks for ${dep?.displayName || "Kid"}`;
+              } else {
+                pageTitle.textContent = "Make Your Picks";
+              }
+
+              // Reset UI state before reloading
+              document.getElementById("games-container").style.display = "flex";
+              document.getElementById("submit-all-button").style.display = "none";
+              document.getElementById("submit-all-button").classList.remove("visible");
+
+              // Reload picks for the selected picker
+              await loadExistingPicks();
+              await window.initializePicks();
+            });
+          }
+        } catch (error) {
+          console.error("Error loading dependents:", error);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          // Load navbar first
+          await loadNavbar();
+
+          // Initialize container reference
+          gamesContainer = document.getElementById("games-container");
+          if (!gamesContainer) {
+            throw new Error("Games container not found");
+          }
+
+          // Get user data from localStorage
+          currentUser = JSON.parse(localStorage.getItem("user"));
+          token = localStorage.getItem("token");
+          window.token = token; // Update global reference
+
+          if (!currentUser || !token) {
+            window.location.href = "/";
+            return;
+          }
+
+          // Load dependents first (to set up picker selector)
+          await loadDependents();
+
+          // Load pool and picks
+          await loadExistingPicks();
+
+          if (!currentPool) {
+            throw new Error("No active pool found");
+          }
+
+          // Always try to initialize picks - it will filter to show only games needing picks
+          await window.initializePicks();
+        } catch (error) {
+          console.error("Error initializing page:", error);
+          gamesContainer.innerHTML = `
+            <div class="error-message">
+              Error loading picks interface: ${error.message}
+            </div>
+          `;
+        }
+      });
+    </script>
+
+    <script>
+      // Add loadGames function
+      async function loadGames() {
+        try {
+          const response = await fetch(
+            `${window.API_URL}/api/games/pool/${window.currentPool._id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${window.token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch games");
+          }
+
+          const games = await response.json();
+          console.log("Loaded games:", games);
+          return games;
+        } catch (error) {
+          console.error("Error loading games:", error);
+          throw error;
+        }
+      }
+
+      function initializePicks() {
+        // Keep existing picks section visible if there are picks
+        const yourPicksSection = document.querySelector(".your-picks-section");
+        if (window.existingPicks && window.existingPicks.length > 0) {
+          yourPicksSection.style.display = "block";
+        }
+
+        // Initialize usedPoints with confidence points from existing picks
+        const usedPoints = new Set();
+        if (window.existingPicks && window.existingPicks.length > 0) {
+          window.existingPicks.forEach(pick => {
+            usedPoints.add(pick.confidencePoints);
+          });
+          console.log("Used points from existing picks:", Array.from(usedPoints));
+        }
+
+        let savedPicks = 0;
+        let allPicks = [];
+        let totalGames = 0;
+        let currentUser = JSON.parse(localStorage.getItem("user"));
+
+        // Page title is updated in displayGames based on whether picks are needed
+
+        function showAlert(message, isError = false) {
+          const modal = document.createElement("div");
+          modal.className = "alert-modal";
+          if (isError) modal.classList.add("error");
+
+          modal.innerHTML = `
+            <div class="alert-content">
+              <p>${message}</p>
+              ${isError ? '<button class="close-alert">Close</button>' : ""}
+            </div>
+          `;
+
+          document.body.appendChild(modal);
+          modal.style.display = "block";
+
+          if (isError) {
+            modal
+              .querySelector(".close-alert")
+              .addEventListener("click", () => {
+                modal.remove();
+              });
+          } else {
+            setTimeout(() => modal.remove(), 2000);
+          }
+        }
+
+        // Use the games data passed from the module
+        async function displayGames(games) {
+          const gamesContainer = document.getElementById("games-container");
+          gamesContainer.innerHTML = ""; // Clear existing content
+
+          // Filter to only show games that:
+          // 1. Don't have picks yet
+          // 2. Are not complete (no winner determined)
+          const existingPickGameIds = window.existingPickGameIds || new Set();
+          const gamesNeedingPicks = games.filter(game =>
+            !existingPickGameIds.has(game._id) && !game.isComplete
+          );
+
+          // Sort by game time
+          gamesNeedingPicks.sort((a, b) => new Date(a.gameTime) - new Date(b.gameTime));
+
+          // If no games need picks, show a message
+          if (gamesNeedingPicks.length === 0) {
+            const pageTitle = document.getElementById("pageTitle");
+            if (pageTitle) {
+              pageTitle.textContent = "Your Picks";
+            }
+            gamesContainer.style.display = "none";
+            document.getElementById("submit-all-button").style.display = "none";
+            return;
+          }
+
+          // Update page title to show picks are needed
+          const pageTitle = document.getElementById("pageTitle");
+          if (pageTitle) {
+            pageTitle.textContent = "Make Your Picks";
+          }
+
+          // Set totalGames so we know when all picks are made
+          totalGames = gamesNeedingPicks.length;
+
+          gamesNeedingPicks.forEach((game) => {
+            const gameCard = document.createElement("div");
+            gameCard.className = "game-section";
+            gameCard.innerHTML = `
+              <div class="game-header">${game.gameTitle}</div>
+              <div class="game-info">
+                <sub>${new Date(game.gameTime).toLocaleString()} - ${
+              game.tvNetwork
+            }</sub>
+              </div>
+              <div class="team-selection">
+                <button class="team-button" data-team="${game.awayTeam}" title="${game.awayTeam}">
+                  <img src="${window.getTeamLogoUrl(game.awayTeam)}" alt="${game.awayTeam}" class="team-logo">
+                </button>
+                <span class="team-vs">@</span>
+                <button class="team-button" data-team="${game.homeTeam}" title="${game.homeTeam}">
+                  <img src="${window.getTeamLogoUrl(game.homeTeam)}" alt="${game.homeTeam}" class="team-logo">
+                </button>
+              </div>
+              <div class="points-display"> <span>0</span></div>
+              <div class="slider-container">
+                <div class="slider">
+                  <div class="thumb" style="left: 0;"></div>
+                </div>
+                <div class="slider-values">
+                  ${Array.from(
+                    { length: 14 },
+                    (_, i) => {
+                      const isUsed = usedPoints.has(i);
+                      const classes = [];
+                      if (i === 0) classes.push("active");
+                      if (isUsed) classes.push("used");
+                      return `<span${classes.length ? ` class="${classes.join(' ')}"` : ""}>${i}</span>`;
+                    }
+                  ).join("")}
+                </div>
+              </div>
+              <button class="save-pick">Post It</button>
+            `;
+
+            // Add event listeners for the card
+            const teamButtons = gameCard.querySelectorAll(".team-button");
+            const slider = gameCard.querySelector(".slider");
+            const thumb = gameCard.querySelector(".thumb");
+            const pointsDisplay = gameCard.querySelector(
+              ".points-display span"
+            );
+            const saveButton = gameCard.querySelector(".save-pick");
+
+            // Team button selection
+            teamButtons.forEach((button) => {
+              button.addEventListener("click", () => {
+                teamButtons.forEach((btn) => btn.classList.remove("selected"));
+                button.classList.add("selected");
+                gameCard.classList.add("active");
+                updateSaveButton();
+              });
+            });
+
+            // Slider functionality
+            let isDragging = false;
+            let startX = 0;
+            let sliderLeft = 0;
+
+            function initializeSlider() {
+              const rect = slider.getBoundingClientRect();
+              sliderLeft = rect.left;
+            }
+
+            function updateSliderPosition(clientX) {
+              const rect = slider.getBoundingClientRect();
+              const sliderWidth = rect.width;
+
+              // Add padding to edges for easier selection of min/max values
+              const edgePadding = 20;
+              const adjustedX = Math.max(
+                -edgePadding,
+                Math.min(clientX - rect.left, sliderWidth + edgePadding)
+              );
+
+              // Smooth out the movement
+              const percentage = Math.max(
+                0,
+                Math.min(
+                  1,
+                  (adjustedX + edgePadding) / (sliderWidth + 2 * edgePadding)
+                )
+              );
+              const rawPoints = percentage * 13;
+              let points = Math.round(rawPoints);
+
+              // If the point value is used, find the nearest available value
+              if (usedPoints.has(points)) {
+                // Try to find nearest unused value
+                let lower = points - 1;
+                let upper = points + 1;
+                while (lower >= 0 || upper <= 13) {
+                  if (lower >= 0 && !usedPoints.has(lower)) {
+                    points = lower;
+                    break;
+                  }
+                  if (upper <= 13 && !usedPoints.has(upper)) {
+                    points = upper;
+                    break;
+                  }
+                  lower--;
+                  upper++;
+                }
+              }
+
+              // Calculate the actual percentage for the thumb based on valid points
+              const actualPercentage = points / 13;
+
+              // Add debouncing for smoother updates
+              clearTimeout(slider.updateTimeout);
+              slider.updateTimeout = setTimeout(() => {
+                thumb.style.left = `${actualPercentage * 100}%`;
+                pointsDisplay.textContent = points;
+
+                updateSliderValues(points);
+              }, 25);
+            }
+
+            function updateSliderValues(activePoints) {
+              const sliderValues = gameCard.querySelectorAll(
+                ".slider-values span"
+              );
+              sliderValues.forEach((span, index) => {
+                if (usedPoints.has(index)) {
+                  span.textContent = "X";
+                  span.classList.add("used");
+                }
+                span.classList.toggle("active", index === activePoints);
+              });
+
+              updateSaveButton();
+            }
+
+            // Handle click on slider
+            slider.addEventListener("mousedown", (e) => {
+              initializeSlider();
+              updateSliderPosition(e.clientX);
+              gameCard.classList.add("active");
+            });
+
+            // Handle drag functionality
+            thumb.addEventListener("mousedown", (e) => {
+              isDragging = true;
+              startX = e.clientX - thumb.offsetLeft;
+              gameCard.classList.add("active");
+              e.stopPropagation();
+            });
+
+            const mouseMoveHandler = (e) => {
+              if (!isDragging) return;
+              e.preventDefault();
+              updateSliderPosition(e.clientX);
+            };
+
+            const mouseUpHandler = () => {
+              isDragging = false;
+            };
+
+            // Add event listeners
+            document.addEventListener("mousemove", mouseMoveHandler);
+            document.addEventListener("mouseup", mouseUpHandler);
+
+            // Clean up event listeners when card is removed
+            gameCard.addEventListener("remove", () => {
+              document.removeEventListener("mousemove", mouseMoveHandler);
+              document.removeEventListener("mouseup", mouseUpHandler);
+            });
+
+            function updateSaveButton() {
+              const hasTeamSelected = gameCard.querySelector(
+                ".team-button.selected"
+              );
+              const points = parseInt(pointsDisplay.textContent);
+              // Only enable if team selected, points > 0, and points not already used
+              if (hasTeamSelected && points > 0 && !usedPoints.has(points)) {
+                saveButton.classList.add("enabled");
+              } else {
+                saveButton.classList.remove("enabled");
+              }
+            }
+
+            // Store game info for use in click handler
+            const gameInfo = {
+              _id: game._id,
+              gameTitle: game.gameTitle,
+              homeTeam: game.homeTeam,
+              awayTeam: game.awayTeam,
+              poolId: game.poolId,
+              round: game.round,
+            };
+
+            saveButton.addEventListener("click", () => {
+              const selectedTeamBtn = gameCard.querySelector(".team-button.selected");
+              if (!selectedTeamBtn) {
+                showAlert("Please select a team first!", true);
+                return;
+              }
+
+              const selectedTeam = selectedTeamBtn.dataset.team;
+              const confidencePoints = parseInt(pointsDisplay.textContent);
+
+              // Validate points aren't already used
+              if (usedPoints.has(confidencePoints)) {
+                showAlert(`${confidencePoints} points has already been used. Please select a different value.`, true);
+                return;
+              }
+
+              // Validate points are greater than 0
+              if (confidencePoints === 0) {
+                showAlert("Please select a confidence value greater than 0!", true);
+                return;
+              }
+
+              // Store the pick data
+              const pickData = {
+                gameId: gameInfo._id,
+                poolId: gameInfo.poolId,
+                round: gameInfo.round,
+                selectedTeam,
+                confidencePoints,
+                // Store display info for the picks list
+                gameTitle: gameInfo.gameTitle,
+                homeTeam: gameInfo.homeTeam,
+                awayTeam: gameInfo.awayTeam,
+              };
+
+              // Add to allPicks array
+              allPicks.push(pickData);
+
+              // Add points to used set
+              usedPoints.add(confidencePoints);
+
+              // Update all other cards' sliders to show used points and reset if on used value
+              document.querySelectorAll(".game-section").forEach((card) => {
+                if (card !== gameCard && card.style.display !== "none") {
+                  const cardPointsDisplay = card.querySelector(".points-display span");
+                  const cardThumb = card.querySelector(".thumb");
+                  const currentCardPoints = parseInt(cardPointsDisplay.textContent);
+
+                  // If this card's slider is on the now-used value, reset to 0
+                  if (currentCardPoints === confidencePoints) {
+                    cardPointsDisplay.textContent = "0";
+                    cardThumb.style.left = "0%";
+                  }
+
+                  // Update slider value displays
+                  const values = card.querySelectorAll(".slider-values span");
+                  values.forEach((span, index) => {
+                    if (usedPoints.has(index)) {
+                      span.textContent = "X";
+                      span.classList.add("used");
+                    }
+                    // Update active state
+                    const newPoints = parseInt(cardPointsDisplay.textContent);
+                    span.classList.toggle("active", index === newPoints);
+                  });
+
+                  // Update save button state for this card
+                  const cardSaveBtn = card.querySelector(".save-pick");
+                  const hasTeamSelected = card.querySelector(".team-button.selected");
+                  const newPoints = parseInt(cardPointsDisplay.textContent);
+                  if (hasTeamSelected && newPoints > 0 && !usedPoints.has(newPoints)) {
+                    cardSaveBtn.classList.add("enabled");
+                  } else {
+                    cardSaveBtn.classList.remove("enabled");
+                  }
+                }
+              });
+
+              // Show Your Picks section when first pick is made
+              const yourPicksSection = document.querySelector(
+                ".your-picks-section"
+              );
+              yourPicksSection.style.display = "block";
+
+              // Add pick to Your Picks section (prepend to show most recent at top)
+              const picksList = document.querySelector(".picks-list");
+              const pickItem = document.createElement("div");
+              pickItem.className = "pick-item";
+              const teamsDisplay = `${gameInfo.awayTeam} @ ${gameInfo.homeTeam}`;
+              pickItem.innerHTML = `
+                <div class="pick-game-info">
+                  <span class="pick-game-title">${gameInfo.gameTitle}</span>
+                  <span class="pick-teams">${teamsDisplay}</span>
+                </div>
+                <span class="pick-team-selected">${selectedTeam}</span>
+                <span class="pick-points">${confidencePoints} pts</span>
+              `;
+              picksList.prepend(pickItem);
+
+              // Hide the card
+              gameCard.style.display = "none";
+
+              // Update saved picks counter and check if all picks are made
+              savedPicks++;
+
+              if (savedPicks === totalGames) {
+                const submitBtn = document.getElementById("submit-all-button");
+                submitBtn.style.display = "block";
+                submitBtn.classList.add("visible");
+                document.getElementById("games-container").style.display =
+                  "none";
+              }
+            });
+
+            gamesContainer.appendChild(gameCard);
+          });
+        }
+
+        // Add click handler for submit all button
+        const submitBtn = document.getElementById("submit-all-button");
+
+        submitBtn.addEventListener("click", async () => {
+          if (allPicks.length === 0) {
+            showAlert("No picks to submit!", true);
+            return;
+          }
+
+          try {
+            // Build payload - include dependentId if picking for a dependent
+            const payload = {
+              participantId: currentUser.id,
+              picks: allPicks
+            };
+
+            // Add dependentId if picking for a dependent
+            if (window.selectedDependentId) {
+              payload.dependentId = window.selectedDependentId;
+            }
+
+            const response = await fetch(`${window.API_URL}/api/picks`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${window.token}`
+              },
+              body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.message || "Failed to submit picks");
+            }
+
+            // Get name for success message
+            const pickerName = window.selectedDependentId
+              ? window.dependents.find(d => d._id === window.selectedDependentId)?.displayName
+              : "Your";
+
+            // Show success message with View Picks link
+            window.showSuccessWithLink(`${pickerName} picks submitted successfully!`);
+
+          } catch (error) {
+            console.error("Error submitting picks:", error);
+            showAlert(`Error: ${error.message}`, true);
+          }
+        });
+
+        // Initialize the interface
+        return loadGames().then((games) => {
+          displayGames(games);
+        });
+      }
+
+      // Make functions available globally
+      window.showAlert = function (message, isError = false) {
+        const modal = document.createElement("div");
+        modal.className = "alert-modal";
+        if (isError) modal.classList.add("error");
+
+        modal.innerHTML = `
+          <div class="alert-content">
+            <p>${message}</p>
+            ${isError ? '<button class="close-alert">Close</button>' : ""}
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.style.display = "block";
+
+        if (isError) {
+          modal.querySelector(".close-alert").addEventListener("click", () => {
+            modal.remove();
+          });
+        } else {
+          setTimeout(() => modal.remove(), 2000);
+        }
+      };
+
+      window.showSuccessWithLink = function(message) {
+        const modal = document.createElement("div");
+        modal.className = "alert-modal success";
+        modal.innerHTML = `
+          <div class="alert-content">
+            <p>${message}</p>
+            <div class="alert-actions">
+              <a href="/picks-summary.html" class="alert-button primary">View Picks</a>
+              <a href="/" class="alert-button secondary">Dashboard</a>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = "block";
+      };
+
+      // Add function to show specific game card
+      function showGameCard(gameId) {
+        const allCards = document.querySelectorAll(".game-section");
+        allCards.forEach((card) => {
+          if (card.dataset.gameId === gameId) {
+            card.style.display = "block";
+          } else {
+            card.style.display = "none";
+          }
+        });
+        document.getElementById("games-container").style.display = "block";
+        document.querySelector(".make-picks-title").style.display = "block";
+      }
+
+      // Make functions available globally
+      window.initializePicks = initializePicks;
+      window.loadGames = loadGames;
+    </script>
+  </body>
+</html>

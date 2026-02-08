@@ -1,0 +1,180 @@
+/* Games stats under subtitle */
+.games-stats {
+  color: #a0aec0;
+  font-size: 0.95em;
+  margin: 8px 0 0 0;
+}
+
+/* Content layout */
+.standings-content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 2rem;
+  align-items: start;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Standings table container */
+.standings-table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.standings-table th,
+.standings-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.standings-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* Sortable headers */
+.standings-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.standings-table th.sortable:hover {
+  background-color: #e2e8f0;
+}
+
+.standings-table th.sortable .sort-indicator {
+  font-size: 0.75em;
+  color: #6b46c1;
+}
+
+.standings-table th.sorted-asc,
+.standings-table th.sorted-desc {
+  background-color: #e9d8fd;
+}
+
+/* Chart container - centered and 20% larger */
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  min-height: 360px;
+  height: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  .standings-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.standings-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #2d3748;
+  padding: 1rem;
+  text-align: left;
+}
+
+.standings-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.standings-table .rank {
+  font-weight: 600;
+  color: #2d3748;
+  text-align: center;
+}
+
+.standings-table .player {
+  font-weight: 500;
+}
+
+.player-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-name {
+  font-weight: 500;
+}
+
+.standings-table .points,
+.standings-table .possible,
+.standings-table .accuracy {
+  text-align: center;
+}
+
+/* Highlight top 3 */
+.standings-table tr:nth-child(1) .rank {
+  color: #d69e2e;
+}
+
+.standings-table tr:nth-child(2) .rank {
+  color: #718096;
+}
+
+.standings-table tr:nth-child(3) .rank {
+  color: #9c4221;
+}
+
+.no-data,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  font-style: italic;
+}
+
+.error {
+  color: #e53e3e;
+}
+
+/* Ensure table fills container */
+.standings-table {
+  width: 100%;
+  min-width: 600px;
+}
+
+/* Center align numeric columns */
+.standings-table .points,
+.standings-table .possible,
+.standings-table .accuracy {
+  text-align: center;
+}
+
+/* Dependent indicator */
+.dependent-indicator {
+  color: #6b46c1;
+  font-weight: bold;
+  margin-left: 4px;
+  cursor: help;
+}
+
+.dependent-row {
+  background-color: #faf5ff;
+}

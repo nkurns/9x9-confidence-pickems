@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>9X9 NFL Playoff Pool - Admin</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/admin.css" />
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="admin-container">
+      <div class="page-header">
+        <h1>Admin Dashboard</h1>
+        <p id="poolNameHeader" class="subtitle">Loading...</p>
+        <div id="poolSelector" class="pool-selector" style="display: none;">
+          <label for="adminPoolSelect">Managing Pool:</label>
+          <select id="adminPoolSelect" onchange="switchPool()"></select>
+        </div>
+      </div>
+
+      <div id="alertContainer"></div>
+
+      <div id="noAdminPools" class="admin-section" style="display: none;">
+        <p>You are not an admin of any pools. <a href="select-pools.html">Create a pool</a> to get started.</p>
+      </div>
+
+      <div id="adminContent">
+      <div class="pool-settings">
+        <h2>Pool Settings</h2>
+        <div id="poolSettingsForm" class="settings-form">
+          <p>Loading pool settings...</p>
+        </div>
+      </div>
+
+      <!-- Add New Game Section -->
+      <div class="admin-section">
+        <h2>Add New Game</h2>
+        <div class="add-game-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="gameTitle">Game Title</label>
+              <input type="text" id="gameTitle" placeholder="e.g., AFC Divisional Game 1" />
+            </div>
+            <div class="form-group">
+              <label for="gameRound">Round</label>
+              <select id="gameRound">
+                <option value="Wild Card">Wild Card</option>
+                <option value="Divisional">Divisional</option>
+                <option value="Conference">Conference</option>
+                <option value="Super Bowl">Super Bowl</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="homeTeam">Home Team</label>
+              <select id="homeTeam">
+                <option value="">-- Select Team --</option>
+                <optgroup label="AFC East">
+                  <option value="Buffalo Bills">Buffalo Bills</option>
+                  <option value="Miami Dolphins">Miami Dolphins</option>
+                  <option value="New England Patriots">New England Patriots</option>
+                  <option value="New York Jets">New York Jets</option>
+                </optgroup>
+                <optgroup label="AFC North">
+                  <option value="Baltimore Ravens">Baltimore Ravens</option>
+                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
+                  <option value="Cleveland Browns">Cleveland Browns</option>
+                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
+                </optgroup>
+                <optgroup label="AFC South">
+                  <option value="Houston Texans">Houston Texans</option>
+                  <option value="Indianapolis Colts">Indianapolis Colts</option>
+                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
+                  <option value="Tennessee Titans">Tennessee Titans</option>
+                </optgroup>
+                <optgroup label="AFC West">
+                  <option value="Denver Broncos">Denver Broncos</option>
+                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
+                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
+                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
+                </optgroup>
+                <optgroup label="NFC East">
+                  <option value="Dallas Cowboys">Dallas Cowboys</option>
+                  <option value="New York Giants">New York Giants</option>
+                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
+                  <option value="Washington Commanders">Washington Commanders</option>
+                </optgroup>
+                <optgroup label="NFC North">
+                  <option value="Chicago Bears">Chicago Bears</option>
+                  <option value="Detroit Lions">Detroit Lions</option>
+                  <option value="Green Bay Packers">Green Bay Packers</option>
+                  <option value="Minnesota Vikings">Minnesota Vikings</option>
+                </optgroup>
+                <optgroup label="NFC South">
+                  <option value="Atlanta Falcons">Atlanta Falcons</option>
+                  <option value="Carolina Panthers">Carolina Panthers</option>
+                  <option value="New Orleans Saints">New Orleans Saints</option>
+                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
+                </optgroup>
+                <optgroup label="NFC West">
+                  <option value="Arizona Cardinals">Arizona Cardinals</option>
+                  <option value="Los Angeles Rams">Los Angeles Rams</option>
+                  <option value="San Francisco 49ers">San Francisco 49ers</option>
+                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="awayTeam">Away Team</label>
+              <select id="awayTeam">
+                <option value="">-- Select Team --</option>
+                <optgroup label="AFC East">
+                  <option value="Buffalo Bills">Buffalo Bills</option>
+                  <option value="Miami Dolphins">Miami Dolphins</option>
+                  <option value="New England Patriots">New England Patriots</option>
+                  <option value="New York Jets">New York Jets</option>
+                </optgroup>
+                <optgroup label="AFC North">
+                  <option value="Baltimore Ravens">Baltimore Ravens</option>
+                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
+                  <option value="Cleveland Browns">Cleveland Browns</option>
+                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
+                </optgroup>
+                <optgroup label="AFC South">
+                  <option value="Houston Texans">Houston Texans</option>
+                  <option value="Indianapolis Colts">Indianapolis Colts</option>
+                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
+                  <option value="Tennessee Titans">Tennessee Titans</option>
+                </optgroup>
+                <optgroup label="AFC West">
+                  <option value="Denver Broncos">Denver Broncos</option>
+                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
+                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
+                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
+                </optgroup>
+                <optgroup label="NFC East">
+                  <option value="Dallas Cowboys">Dallas Cowboys</option>
+                  <option value="New York Giants">New York Giants</option>
+                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
+                  <option value="Washington Commanders">Washington Commanders</option>
+                </optgroup>
+                <optgroup label="NFC North">
+                  <option value="Chicago Bears">Chicago Bears</option>
+                  <option value="Detroit Lions">Detroit Lions</option>
+                  <option value="Green Bay Packers">Green Bay Packers</option>
+                  <option value="Minnesota Vikings">Minnesota Vikings</option>
+                </optgroup>
+                <optgroup label="NFC South">
+                  <option value="Atlanta Falcons">Atlanta Falcons</option>
+                  <option value="Carolina Panthers">Carolina Panthers</option>
+                  <option value="New Orleans Saints">New Orleans Saints</option>
+                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
+                </optgroup>
+                <optgroup label="NFC West">
+                  <option value="Arizona Cardinals">Arizona Cardinals</option>
+                  <option value="Los Angeles Rams">Los Angeles Rams</option>
+                  <option value="San Francisco 49ers">San Francisco 49ers</option>
+                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="gameTime">Game Date/Time</label>
+              <input type="datetime-local" id="gameTime" />
+            </div>
+            <div class="form-group">
+              <label for="tvNetwork">TV Network</label>
+              <input type="text" id="tvNetwork" placeholder="e.g., CBS, FOX, NBC, ESPN" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-success" onclick="addGame()">Add Game</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Participants Section -->
+      <div class="admin-section">
+        <h2>Manage Participants</h2>
+        <div class="participants-container">
+          <div class="add-participant-form">
+            <h3>Add Participant</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="participantName">Display Name</label>
+                <input type="text" id="participantName" placeholder="e.g., John Smith" />
+              </div>
+              <div class="form-group">
+                <label for="participantEmail">Email</label>
+                <input type="email" id="participantEmail" placeholder="e.g., john@example.com" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-success" onclick="addParticipant()">Add Participant</button>
+            </div>
+          </div>
+          <div class="participants-list">
+            <h3>Current Participants</h3>
+            <div id="participantsList">Loading participants...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Make Picks on Behalf Section -->
+      <div class="admin-section">
+        <h2>Make Picks on Behalf of Participant</h2>
+        <div class="proxy-picks-container">
+          <div class="form-group">
+            <label for="selectedParticipant">Select Participant</label>
+            <select id="selectedParticipant" onchange="loadParticipantPicks()">
+              <option value="">-- Select Participant --</option>
+            </select>
+          </div>
+          <div id="proxyPicksForm" class="proxy-picks-form" style="display: none;">
+            <div id="proxyGamesList"></div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="saveProxyPicks()">Save Picks</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider">
+        <h2>Game Administration</h2>
+      </div>
+
+      <div id="gamesList" class="games-list">
+        <p>Loading games...</p>
+      </div>
+      </div><!-- end adminContent -->
+    </div>
+
+    <!-- Edit Game Modal -->
+    <div id="editGameModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2>Edit Game</h2>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editGameId" />
+          <div class="form-group">
+            <label for="editGameTitle">Game Title</label>
+            <input type="text" id="editGameTitle" />
+          </div>
+          <div class="form-group">
+            <label for="editGameRound">Round</label>
+            <select id="editGameRound">
+              <option value="Wild Card">Wild Card</option>
+              <option value="Divisional">Divisional</option>
+              <option value="Conference">Conference</option>
+              <option value="Super Bowl">Super Bowl</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editHomeTeam">Home Team</label>
+              <select id="editHomeTeam">
+                <option value="">-- Select Team --</option>
+                <optgroup label="AFC East">
+                  <option value="Buffalo Bills">Buffalo Bills</option>
+                  <option value="Miami Dolphins">Miami Dolphins</option>
+                  <option value="New England Patriots">New England Patriots</option>
+                  <option value="New York Jets">New York Jets</option>
+                </optgroup>
+                <optgroup label="AFC North">
+                  <option value="Baltimore Ravens">Baltimore Ravens</option>
+                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
+                  <option value="Cleveland Browns">Cleveland Browns</option>
+                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
+                </optgroup>
+                <optgroup label="AFC South">
+                  <option value="Houston Texans">Houston Texans</option>
+                  <option value="Indianapolis Colts">Indianapolis Colts</option>
+                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
+                  <option value="Tennessee Titans">Tennessee Titans</option>
+                </optgroup>
+                <optgroup label="AFC West">
+                  <option value="Denver Broncos">Denver Broncos</option>
+                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
+                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
+                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
+                </optgroup>
+                <optgroup label="NFC East">
+                  <option value="Dallas Cowboys">Dallas Cowboys</option>
+                  <option value="New York Giants">New York Giants</option>
+                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
+                  <option value="Washington Commanders">Washington Commanders</option>
+                </optgroup>
+                <optgroup label="NFC North">
+                  <option value="Chicago Bears">Chicago Bears</option>
+                  <option value="Detroit Lions">Detroit Lions</option>
+                  <option value="Green Bay Packers">Green Bay Packers</option>
+                  <option value="Minnesota Vikings">Minnesota Vikings</option>
+                </optgroup>
+                <optgroup label="NFC South">
+                  <option value="Atlanta Falcons">Atlanta Falcons</option>
+                  <option value="Carolina Panthers">Carolina Panthers</option>
+                  <option value="New Orleans Saints">New Orleans Saints</option>
+                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
+                </optgroup>
+                <optgroup label="NFC West">
+                  <option value="Arizona Cardinals">Arizona Cardinals</option>
+                  <option value="Los Angeles Rams">Los Angeles Rams</option>
+                  <option value="San Francisco 49ers">San Francisco 49ers</option>
+                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editAwayTeam">Away Team</label>
+              <select id="editAwayTeam">
+                <option value="">-- Select Team --</option>
+                <optgroup label="AFC East">
+                  <option value="Buffalo Bills">Buffalo Bills</option>
+                  <option value="Miami Dolphins">Miami Dolphins</option>
+                  <option value="New England Patriots">New England Patriots</option>
+                  <option value="New York Jets">New York Jets</option>
+                </optgroup>
+                <optgroup label="AFC North">
+                  <option value="Baltimore Ravens">Baltimore Ravens</option>
+                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
+                  <option value="Cleveland Browns">Cleveland Browns</option>
+                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
+                </optgroup>
+                <optgroup label="AFC South">
+                  <option value="Houston Texans">Houston Texans</option>
+                  <option value="Indianapolis Colts">Indianapolis Colts</option>
+                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
+                  <option value="Tennessee Titans">Tennessee Titans</option>
+                </optgroup>
+                <optgroup label="AFC West">
+                  <option value="Denver Broncos">Denver Broncos</option>
+                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
+                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
+                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
+                </optgroup>
+                <optgroup label="NFC East">
+                  <option value="Dallas Cowboys">Dallas Cowboys</option>
+                  <option value="New York Giants">New York Giants</option>
+                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
+                  <option value="Washington Commanders">Washington Commanders</option>
+                </optgroup>
+                <optgroup label="NFC North">
+                  <option value="Chicago Bears">Chicago Bears</option>
+                  <option value="Detroit Lions">Detroit Lions</option>
+                  <option value="Green Bay Packers">Green Bay Packers</option>
+                  <option value="Minnesota Vikings">Minnesota Vikings</option>
+                </optgroup>
+                <optgroup label="NFC South">
+                  <option value="Atlanta Falcons">Atlanta Falcons</option>
+                  <option value="Carolina Panthers">Carolina Panthers</option>
+                  <option value="New Orleans Saints">New Orleans Saints</option>
+                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
+                </optgroup>
+                <optgroup label="NFC West">
+                  <option value="Arizona Cardinals">Arizona Cardinals</option>
+                  <option value="Los Angeles Rams">Los Angeles Rams</option>
+                  <option value="San Francisco 49ers">San Francisco 49ers</option>
+                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editGameTime">Game Date/Time</label>
+              <input type="datetime-local" id="editGameTime" />
+            </div>
+            <div class="form-group">
+              <label for="editTvNetwork">TV Network</label>
+              <input type="text" id="editTvNetwork" />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-button modal-cancel" onclick="closeEditGameModal()">Cancel</button>
+          <button class="modal-button modal-confirm" onclick="saveGameEdits()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+
+      let games = [];
+      let selectedWinners = {};
+      let currentPool = null;
+      let adminPools = [];
+      let participants = [];
+      let proxyPicks = {};
+
+      async function initializePage() {
+        await loadNavbar();
+
+        if (!auth.isAuthenticated()) {
+          window.location.href = "/";
+          return;
+        }
+
+        await loadAdminPools();
+      }
+
+      async function loadAdminPools() {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/pools/admin`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (!response.ok) throw new Error("Failed to fetch admin pools");
+
+          adminPools = await response.json();
+
+          if (!adminPools.length) {
+            // User is not admin of any pools
+            document.getElementById("adminContent").style.display = "none";
+            document.getElementById("noAdminPools").style.display = "block";
+            document.getElementById("poolNameHeader").textContent = "No pools to manage";
+            return;
+          }
+
+          // Find the active pool, or fall back to first pool
+          const activePool = adminPools.find(p => p.isActive) || adminPools[0];
+          currentPool = activePool;
+
+          // Show pool selector if multiple pools
+          if (adminPools.length > 1) {
+            const selector = document.getElementById("poolSelector");
+            const select = document.getElementById("adminPoolSelect");
+            selector.style.display = "block";
+            select.innerHTML = adminPools.map(pool =>
+              `<option value="${pool._id}" ${pool._id === currentPool._id ? 'selected' : ''}>${pool.name}</option>`
+            ).join("");
+          }
+          updatePoolHeader();
+          await loadPoolAndGames();
+          await loadParticipants();
+        } catch (error) {
+          console.error("Error loading admin pools:", error);
+          showAlert("Error loading pools: " + error.message, "error");
+        }
+      }
+
+      function updatePoolHeader() {
+        document.getElementById("poolNameHeader").textContent = currentPool.name;
+      }
+
+      window.switchPool = async function() {
+        const poolId = document.getElementById("adminPoolSelect").value;
+        currentPool = adminPools.find(p => p._id === poolId);
+        updatePoolHeader();
+        await loadPoolAndGames();
+        await loadParticipants();
+      };
+
+      // Add Game
+      window.addGame = async function() {
+        const gameTitle = document.getElementById("gameTitle").value;
+        const homeTeam = document.getElementById("homeTeam").value;
+        const awayTeam = document.getElementById("awayTeam").value;
+        const gameTime = document.getElementById("gameTime").value;
+        const round = document.getElementById("gameRound").value;
+        const tvNetwork = document.getElementById("tvNetwork").value;
+
+        if (!gameTitle || !homeTeam || !awayTeam || !gameTime) {
+          showAlert("Please fill in all required fields", "error");
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/games`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              gameTitle,
+              homeTeam,
+              awayTeam,
+              gameTime,
+              round,
+              tvNetwork,
+              poolId: currentPool._id
+            })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to create game");
+          }
+
+          showAlert("Game added successfully!", "success");
+          // Clear form
+          document.getElementById("gameTitle").value = "";
+          document.getElementById("homeTeam").selectedIndex = 0;
+          document.getElementById("awayTeam").selectedIndex = 0;
+          document.getElementById("gameTime").value = "";
+          document.getElementById("tvNetwork").value = "";
+
+          await loadPoolAndGames();
+        } catch (error) {
+          console.error("Error adding game:", error);
+          showAlert("Error adding game: " + error.message, "error");
+        }
+      };
+
+      // Load Participants
+      async function loadParticipants() {
+        if (!currentPool) return;
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/participants/pool/${currentPool._id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (!response.ok) throw new Error("Failed to fetch participants");
+
+          participants = await response.json();
+          renderParticipants();
+          updateParticipantDropdown();
+        } catch (error) {
+          console.error("Error loading participants:", error);
+          document.getElementById("participantsList").innerHTML =
+            `<p class="error">Error loading participants</p>`;
+        }
+      }
+
+      function renderParticipants() {
+        const container = document.getElementById("participantsList");
+
+        if (!participants.length) {
+          container.innerHTML = "<p>No participants yet</p>";
+          return;
+        }
+
+        container.innerHTML = participants.map(p => `
+          <div class="participant-item">
+            <div>
+              <div class="name">${p.displayName}</div>
+              <div class="email">${p.email || ''}</div>
+            </div>
+            <span class="picks-status ${p.picksComplete ? 'complete' : 'pending'}">
+              ${p.picksCount}/${p.totalGames} picks
+            </span>
+          </div>
+        `).join("");
+      }
+
+      function updateParticipantDropdown() {
+        const select = document.getElementById("selectedParticipant");
+        let options = '<option value="">-- Select Participant --</option>';
+
+        participants.forEach(p => {
+          // Add participant
+          options += `<option value="${p._id}">${p.displayName}</option>`;
+
+          // Add their kids (indented)
+          if (p.dependents && p.dependents.length > 0) {
+            p.dependents.forEach(dep => {
+              options += `<option value="${p._id}:${dep._id}">&nbsp;&nbsp;↳ ${dep.displayName} (${p.displayName}'s kid)</option>`;
+            });
+          }
+        });
+
+        select.innerHTML = options;
+      }
+
+      // Add Participant
+      window.addParticipant = async function() {
+        const displayName = document.getElementById("participantName").value;
+        const email = document.getElementById("participantEmail").value;
+
+        if (!displayName || !email) {
+          showAlert("Please fill in name and email", "error");
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/participants/admin/create`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              displayName,
+              email,
+              poolId: currentPool._id
+            })
+          });
+
+          if (!response.ok) throw new Error("Failed to add participant");
+
+          showAlert("Participant added successfully!", "success");
+          document.getElementById("participantName").value = "";
+          document.getElementById("participantEmail").value = "";
+
+          await loadParticipants();
+        } catch (error) {
+          console.error("Error adding participant:", error);
+          showAlert("Error adding participant: " + error.message, "error");
+        }
+      };
+
+      // Store current selection for saving
+      let currentProxyParticipantId = null;
+      let currentProxyDependentId = null;
+
+      // Load picks form for selected participant
+      window.loadParticipantPicks = async function() {
+        console.log("loadParticipantPicks called");
+        const selectedValue = document.getElementById("selectedParticipant").value;
+        console.log("selectedValue:", selectedValue);
+        const formContainer = document.getElementById("proxyPicksForm");
+
+        if (!selectedValue) {
+          console.log("No selected value, returning");
+          formContainer.style.display = "none";
+          currentProxyParticipantId = null;
+          currentProxyDependentId = null;
+          return;
+        }
+
+        // Parse the value - could be "participantId" or "participantId:dependentId"
+        const parts = selectedValue.split(":");
+        currentProxyParticipantId = parts[0];
+        currentProxyDependentId = parts[1] || null;
+        console.log("participantId:", currentProxyParticipantId, "dependentId:", currentProxyDependentId);
+
+        formContainer.style.display = "block";
+
+        try {
+          const token = localStorage.getItem("token");
+          console.log("currentPool:", currentPool);
+
+          // Get existing picks for this participant/dependent
+          let picksUrl = `${API_URL}/api/participants/${currentProxyParticipantId}/picks/${currentPool._id}`;
+          console.log("Fetching picks from:", picksUrl);
+          if (currentProxyDependentId) {
+            picksUrl += `?dependentId=${currentProxyDependentId}`;
+          }
+
+          const picksResponse = await fetch(picksUrl, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          const existingPicks = picksResponse.ok ? await picksResponse.json() : [];
+          console.log("Loaded existing picks:", existingPicks);
+
+          // Initialize proxyPicks from existing picks
+          proxyPicks = {};
+          existingPicks.forEach(p => {
+            proxyPicks[p.gameId] = { team: p.selectedTeam, points: parseInt(p.confidencePoints) || null };
+          });
+          console.log("proxyPicks after load:", proxyPicks);
+          console.log("games:", games);
+
+          // Render games with pick options
+          renderProxyGames();
+        } catch (error) {
+          console.error("Error loading participant picks:", error);
+          console.error("Error stack:", error.stack);
+          showAlert("Error loading picks: " + error.message, "error");
+        }
+      };
+
+      function renderProxyGames() {
+        const gamesContainer = document.getElementById("proxyGamesList");
+        const totalGames = currentPool.totalGames || games.length;
+
+        console.log("renderProxyGames - games count:", games.length);
+        console.log("renderProxyGames - incomplete games:", games.filter(g => !g.isComplete).map(g => g.gameTitle));
+
+        // Get all used points (only from incomplete games)
+        const usedPoints = new Set();
+        Object.entries(proxyPicks).forEach(([gameId, pick]) => {
+          const game = games.find(g => g._id === gameId);
+          const pts = parseInt(pick.points);
+          console.log(`Checking gameId ${gameId}: found game?`, game ? game.gameTitle : 'NO', "pick.points:", pick.points, "parsed:", pts, "isComplete:", game?.isComplete);
+          if (pts && game && !game.isComplete) {
+            usedPoints.add(pts);
+          }
+        });
+        console.log("usedPoints:", Array.from(usedPoints));
+
+        gamesContainer.innerHTML = games.map(game => {
+          const existingPick = proxyPicks[game._id] || {};
+          const currentPoints = existingPick.points;
+          const isComplete = game.isComplete;
+          console.log("Rendering game:", game.gameTitle, "isComplete:", isComplete);
+
+          // For completed games, show read-only display
+          if (isComplete) {
+            const resultClass = existingPick.team === game.winner ? 'correct' : 'incorrect';
+            return `
+              <div class="proxy-game-item complete ${resultClass}" data-game-id="${game._id}" data-round="${game.round}">
+                <div class="game-title">${game.gameTitle} <span class="game-status-badge">Final</span></div>
+                <div class="game-matchup">${game.awayTeam} @ ${game.homeTeam}</div>
+                <div class="pick-row locked">
+                  <div class="locked-pick">
+                    <span class="pick-team">${existingPick.team || 'No pick'}</span>
+                    <span class="pick-points-display">${existingPick.points || '-'} pts</span>
+                    <span class="pick-result ${resultClass}">${existingPick.team === game.winner ? '✓' : '✗'}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+
+          // Build points options - show available + current selection
+          const currentPointsNum = parseInt(currentPoints) || 0;
+          const pointsOptions = Array.from({length: totalGames}, (_, i) => i + 1)
+            .reverse()
+            .map(n => {
+              const isUsed = usedPoints.has(n) && n !== currentPointsNum;
+              const isSelected = currentPointsNum === n;
+              console.log(`Game ${game.gameTitle} - Option ${n}: isUsed=${isUsed}, isSelected=${isSelected}, currentPointsNum=${currentPointsNum}`);
+              if (isUsed) {
+                return `<option value="${n}" disabled style="color: #a0aec0;">${n} (used)</option>`;
+              }
+              return `<option value="${n}" ${isSelected ? 'selected' : ''}>${n}</option>`;
+            }).join('');
+
+          return `
+            <div class="proxy-game-item" data-game-id="${game._id}" data-round="${game.round}">
+              <div class="game-title">${game.gameTitle}</div>
+              <div class="game-matchup">${game.awayTeam} @ ${game.homeTeam}</div>
+              <div class="pick-row">
+                <div class="team-select">
+                  <select id="team-${game._id}" onchange="updateProxyPick('${game._id}')">
+                    <option value="">-- Select Team --</option>
+                    <option value="${game.homeTeam}" ${existingPick.team === game.homeTeam ? 'selected' : ''}>${game.homeTeam}</option>
+                    <option value="${game.awayTeam}" ${existingPick.team === game.awayTeam ? 'selected' : ''}>${game.awayTeam}</option>
+                  </select>
+                </div>
+                <div class="points-select">
+                  <select id="points-${game._id}" onchange="updateProxyPick('${game._id}')">
+                    <option value="">Pts</option>
+                    ${pointsOptions}
+                  </select>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      window.updateProxyPick = function(gameId) {
+        const team = document.getElementById(`team-${gameId}`).value;
+        const points = parseInt(document.getElementById(`points-${gameId}`).value);
+        console.log("updateProxyPick called:", gameId, "team:", team, "points:", points);
+
+        if (team && points) {
+          proxyPicks[gameId] = { team, points };
+        } else if (team) {
+          proxyPicks[gameId] = { team, points: null };
+        } else {
+          delete proxyPicks[gameId];
+        }
+        console.log("proxyPicks after update:", JSON.stringify(proxyPicks));
+
+        // Re-render to update available points
+        renderProxyGames();
+      };
+
+      window.saveProxyPicks = async function() {
+        if (!currentProxyParticipantId) {
+          showAlert("Please select a participant", "error");
+          return;
+        }
+
+        console.log("Saving picks for:", {
+          participantId: currentProxyParticipantId,
+          dependentId: currentProxyDependentId,
+          proxyPicks
+        });
+
+        // Build picks array - only for incomplete games
+        const picks = Object.entries(proxyPicks)
+          .filter(([gameId, pick]) => {
+            const game = games.find(g => g._id === gameId);
+            return game && !game.isComplete; // Only include picks for incomplete games
+          })
+          .map(([gameId, pick]) => {
+            const game = games.find(g => g._id === gameId);
+            return {
+              gameId,
+              selectedTeam: pick.team,
+              confidencePoints: pick.points,
+              round: game ? game.round : "Wild Card"
+            };
+          });
+
+        if (picks.length === 0) {
+          showAlert("Please make at least one pick", "error");
+          return;
+        }
+
+        // Check for duplicate points
+        const usedPoints = new Set();
+        for (const pick of picks) {
+          if (usedPoints.has(pick.confidencePoints)) {
+            showAlert(`Duplicate points value: ${pick.confidencePoints}`, "error");
+            return;
+          }
+          usedPoints.add(pick.confidencePoints);
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+
+          // Build payload with optional dependentId
+          const payload = {
+            participantId: currentProxyParticipantId,
+            poolId: currentPool._id,
+            picks
+          };
+          if (currentProxyDependentId) {
+            payload.dependentId = currentProxyDependentId;
+          }
+
+          console.log("Sending payload:", payload);
+
+          const response = await fetch(`${API_URL}/api/participants/admin/picks`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const responseData = await response.json();
+          console.log("Response:", response.status, responseData);
+
+          if (!response.ok) {
+            throw new Error(responseData.message || "Failed to save picks");
+          }
+
+          // Scroll to top so alert is visible
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+
+          // Clear the form and reset state
+          proxyPicks = {};
+          currentProxyParticipantId = null;
+          currentProxyDependentId = null;
+          document.getElementById("selectedParticipant").value = "";
+          document.getElementById("proxyPicksForm").style.display = "none";
+          document.getElementById("proxyGamesList").innerHTML = "";
+
+          showAlert("Picks saved successfully!", "success");
+          await loadParticipants();
+        } catch (error) {
+          console.error("Error saving picks:", error);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showAlert("Error saving picks: " + error.message, "error");
+        }
+      };
+
+      async function loadPoolAndGames() {
+        if (!currentPool) return;
+
+        try {
+          const token = localStorage.getItem("token");
+
+          renderPoolSettings();
+
+          // Get games for this pool
+          const gamesResponse = await fetch(`${API_URL}/api/games/pool/${currentPool._id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (!gamesResponse.ok) throw new Error("Failed to fetch games");
+
+          games = await gamesResponse.json();
+
+          // Sort games: incomplete first (chronological), then complete (reverse chronological)
+          games.sort((a, b) => {
+            // Incomplete games come first
+            if (a.isComplete !== b.isComplete) {
+              return a.isComplete ? 1 : -1;
+            }
+            // Incomplete: chronological (oldest first)
+            if (!a.isComplete) {
+              return new Date(a.gameTime) - new Date(b.gameTime);
+            }
+            // Complete: reverse chronological (newest first)
+            return new Date(b.gameTime) - new Date(a.gameTime);
+          });
+
+          renderGames();
+        } catch (error) {
+          console.error("Error loading games:", error);
+          document.getElementById("gamesList").innerHTML =
+            `<p class="error">Error loading games: ${error.message}</p>`;
+        }
+      }
+
+      function renderGames() {
+        const container = document.getElementById("gamesList");
+
+        if (!games.length) {
+          container.innerHTML = "<p>No games found</p>";
+          return;
+        }
+
+        container.innerHTML = games.map(game => `
+          <div class="game-card ${game.isComplete ? 'complete' : ''}">
+            <div class="game-header">
+              <span class="game-title">${game.gameTitle}</span>
+              <span class="game-status ${game.isComplete ? 'complete' : 'pending'}">
+                ${game.isComplete ? 'Complete' : 'Pending'}
+              </span>
+            </div>
+            <div class="game-info">
+              ${new Date(game.gameTime).toLocaleString()} - ${game.tvNetwork || 'TBD'} - ${game.round}
+            </div>
+            <div class="game-teams">
+              <button
+                class="team-option ${game.winner === game.homeTeam ? 'winner' : ''} ${selectedWinners[game._id] === game.homeTeam ? 'selected' : ''}"
+                onclick="selectWinner('${game._id}', '${game.homeTeam}')"
+                ${game.isComplete ? 'disabled' : ''}
+              >
+                ${game.homeTeam}
+              </button>
+              <span class="vs-divider">vs</span>
+              <button
+                class="team-option ${game.winner === game.awayTeam ? 'winner' : ''} ${selectedWinners[game._id] === game.awayTeam ? 'selected' : ''}"
+                onclick="selectWinner('${game._id}', '${game.awayTeam}')"
+                ${game.isComplete ? 'disabled' : ''}
+              >
+                ${game.awayTeam}
+              </button>
+            </div>
+            <div class="game-actions">
+              <button class="btn btn-secondary" onclick="openEditGameModal('${game._id}')">
+                Edit
+              </button>
+              ${game.isComplete ? `
+                <button class="btn btn-danger" onclick="reopenGame('${game._id}')">
+                  Reopen Game
+                </button>
+              ` : `
+                <button
+                  class="btn btn-success"
+                  onclick="markComplete('${game._id}')"
+                  ${!selectedWinners[game._id] ? 'disabled' : ''}
+                >
+                  Mark Complete
+                </button>
+              `}
+            </div>
+          </div>
+        `).join("");
+      }
+
+      window.selectWinner = function(gameId, team) {
+        selectedWinners[gameId] = team;
+        renderGames();
+      };
+
+      window.markComplete = async function(gameId) {
+        const winner = selectedWinners[gameId];
+        if (!winner) {
+          showAlert("Please select a winner first", "error");
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/games/${gameId}/complete`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ winner, isComplete: true })
+          });
+
+          if (!response.ok) throw new Error("Failed to update game");
+
+          showAlert("Game marked as complete!", "success");
+          await loadPoolAndGames();
+        } catch (error) {
+          console.error("Error:", error);
+          showAlert("Error updating game: " + error.message, "error");
+        }
+      };
+
+      window.reopenGame = async function(gameId) {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/games/${gameId}/complete`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ winner: "", isComplete: false })
+          });
+
+          if (!response.ok) throw new Error("Failed to update game");
+
+          showAlert("Game reopened!", "success");
+          delete selectedWinners[gameId];
+          await loadPoolAndGames();
+        } catch (error) {
+          console.error("Error:", error);
+          showAlert("Error updating game: " + error.message, "error");
+        }
+      };
+
+      // Edit Game Functions
+      window.openEditGameModal = function(gameId) {
+        const game = games.find(g => g._id === gameId);
+        if (!game) return;
+
+        document.getElementById("editGameId").value = gameId;
+        document.getElementById("editGameTitle").value = game.gameTitle;
+        document.getElementById("editGameRound").value = game.round;
+        document.getElementById("editHomeTeam").value = game.homeTeam;
+        document.getElementById("editAwayTeam").value = game.awayTeam;
+        document.getElementById("editTvNetwork").value = game.tvNetwork || "";
+
+        // Format date for datetime-local input
+        const gameDate = new Date(game.gameTime);
+        const localDatetime = gameDate.toISOString().slice(0, 16);
+        document.getElementById("editGameTime").value = localDatetime;
+
+        document.getElementById("editGameModal").style.display = "flex";
+      };
+
+      window.closeEditGameModal = function() {
+        document.getElementById("editGameModal").style.display = "none";
+      };
+
+      window.saveGameEdits = async function() {
+        const gameId = document.getElementById("editGameId").value;
+        const gameTitle = document.getElementById("editGameTitle").value;
+        const round = document.getElementById("editGameRound").value;
+        const homeTeam = document.getElementById("editHomeTeam").value;
+        const awayTeam = document.getElementById("editAwayTeam").value;
+        const gameTime = document.getElementById("editGameTime").value;
+        const tvNetwork = document.getElementById("editTvNetwork").value;
+
+        if (!gameTitle || !homeTeam || !awayTeam || !gameTime) {
+          showAlert("Please fill in all required fields", "error");
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/games/${gameId}`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              gameTitle,
+              round,
+              homeTeam,
+              awayTeam,
+              gameTime,
+              tvNetwork
+            })
+          });
+
+          if (!response.ok) throw new Error("Failed to update game");
+
+          showAlert("Game updated successfully!", "success");
+          closeEditGameModal();
+          await loadPoolAndGames();
+        } catch (error) {
+          console.error("Error updating game:", error);
+          showAlert("Error updating game: " + error.message, "error");
+        }
+      };
+
+      function showAlert(message, type) {
+        const container = document.getElementById("alertContainer");
+        container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        setTimeout(() => container.innerHTML = "", 3000);
+      }
+
+      function renderPoolSettings() {
+        if (!currentPool) return;
+
+        const container = document.getElementById("poolSettingsForm");
+        const startDate = currentPool.startDate ? new Date(currentPool.startDate).toISOString().split('T')[0] : '';
+        const endDate = currentPool.endDate ? new Date(currentPool.endDate).toISOString().split('T')[0] : '';
+
+        container.innerHTML = `
+          <div class="form-group">
+            <label for="poolName">Pool Name</label>
+            <input type="text" id="poolName" value="${currentPool.name || ''}" />
+          </div>
+          <div class="form-group">
+            <label for="totalGames">Total Games</label>
+            <input type="number" id="totalGames" value="${currentPool.totalGames || 13}" min="1" max="50" />
+          </div>
+          <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" value="${startDate}" />
+          </div>
+          <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" value="${endDate}" />
+          </div>
+          <div class="settings-actions">
+            <button class="btn btn-primary" onclick="savePoolSettings()">Save Settings</button>
+          </div>
+        `;
+      }
+
+      window.savePoolSettings = async function() {
+        if (!currentPool) return;
+
+        const name = document.getElementById("poolName").value;
+        const totalGames = parseInt(document.getElementById("totalGames").value);
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/pools/${currentPool._id}`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              name,
+              totalGames,
+              startDate: new Date(startDate).toISOString(),
+              endDate: new Date(endDate).toISOString()
+            })
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to update pool");
+          }
+
+          const updatedPool = await response.json();
+          currentPool = updatedPool;
+          showAlert("Pool settings saved successfully!", "success");
+          renderPoolSettings();
+        } catch (error) {
+          console.error("Error saving pool settings:", error);
+          showAlert("Error saving pool settings: " + error.message, "error");
+        }
+      };
+
+      document.addEventListener("DOMContentLoaded", initializePage);
+    </script>
+  </body>
+</html>

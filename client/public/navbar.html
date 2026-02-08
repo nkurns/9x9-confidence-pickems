@@ -1,0 +1,209 @@
+<link rel="stylesheet" href="styles/navbar.css" />
+<div class="nav-container">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a href="index.html">9X9 Playoff Pools</a>
+    </div>
+    <div class="navbar-menu">
+      <a href="index.html">Dashboard</a>
+      <a href="make-picks.html">Make Picks</a>
+      <a href="picks-summary.html">View Picks</a>
+      <a href="standings.html">Standings</a>
+    </div>
+    <div class="navbar-end">
+      <div id="userInfo" class="user-info">
+        <!-- Will be populated with user info -->
+      </div>
+      <div id="authButtons" class="auth-buttons">
+        <!-- Will be populated with login/register or profile dropdown -->
+      </div>
+    </div>
+  </nav>
+
+  <div id="logoutModal" class="modal-overlay" style="display: none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Sign Out</h2>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to sign out?</p>
+      </div>
+      <div class="modal-footer">
+        <button onclick="auth.closeLogoutModal()" class="modal-button modal-cancel">
+          Cancel
+        </button>
+        <button onclick="auth.logoutUser()" class="modal-button modal-confirm destructive">
+          Yes, Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginModal" class="modal-overlay" style="display: none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Sign In</h2>
+      </div>
+      <form id="loginForm" onsubmit="window.handleLoginSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <input
+              type="email"
+              id="loginEmail"
+              placeholder="Email"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              required
+              minlength="6"
+            />
+          </div>
+          <div
+            id="loginError"
+            class="error-message"
+            style="display: none"
+          ></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="modal-button modal-confirm">
+            Sign In
+          </button>
+          <button
+            type="button"
+            onclick="window.closeLoginModal()"
+            class="modal-button modal-cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log("Navbar - User data:", user);
+
+    const userInfo = document.getElementById("userInfo");
+    const authButtons = document.getElementById("authButtons");
+
+    if (user && user.username) {
+      console.log("Rendering authenticated user interface");
+
+      if (userInfo) {
+        // Check if user is admin of any pools
+        const token = localStorage.getItem("token");
+        let isAdmin = false;
+
+        if (token) {
+          try {
+            const response = await fetch("/api/pools/admin", {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+              const adminPools = await response.json();
+              isAdmin = adminPools.length > 0;
+            }
+          } catch (err) {
+            console.log("Error checking admin status:", err);
+          }
+        }
+
+        const adminLink = isAdmin ? `<a href="admin.html">Admin</a>` : '';
+        const adminDivider = isAdmin ? `<div class="dropdown-divider"></div>` : '';
+
+        userInfo.innerHTML = `
+          <button class="profile-button">
+            ${user.displayName || user.username}
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="profile-dropdown">
+            <a href="profile.html">Profile</a>
+            ${adminDivider}
+            ${adminLink}
+            <div class="dropdown-divider"></div>
+            <button onclick="showLogoutModal()">Sign Out</button>
+          </div>
+        `;
+
+        // Call setupProfileDropdown after adding the button
+        setupProfileDropdown();
+      }
+    } else {
+      console.log("Rendering guest interface");
+      if (authButtons) {
+        authButtons.innerHTML = `
+          <button onclick="auth.showLoginModal()" class="auth-button login-button">Sign In</button>
+          <a href="register.html" class="auth-button register-button">Sign Up</a>
+        `;
+      }
+    }
+  });
+
+  // Update the profile dropdown toggle function
+  function setupProfileDropdown() {
+    console.log("Setting up profile dropdown");
+    const profileButton = document.querySelector(".profile-button");
+    const dropdown = document.querySelector(".profile-dropdown");
+
+    if (profileButton && dropdown) {
+      console.log("Found profile button and dropdown");
+
+      profileButton.addEventListener("click", (e) => {
+        console.log("Profile button clicked");
+        e.stopPropagation();
+        dropdown.classList.toggle("show");
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener("click", (e) => {
+        if (!dropdown.contains(e.target) && !profileButton.contains(e.target)) {
+          dropdown.classList.remove("show");
+        }
+      });
+    } else {
+      console.log("Profile elements not found:", {
+        buttonFound: !!profileButton,
+        dropdownFound: !!dropdown,
+      });
+    }
+  }
+
+  // Update the logout confirmation modal
+  function showLogoutConfirmation() {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Confirm Logout</h2>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to log out?</p>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-button modal-cancel">Cancel</button>
+          <button class="modal-button modal-confirm">Logout</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector(".modal-cancel").addEventListener("click", () => {
+      modal.remove();
+    });
+
+    modal.querySelector(".modal-confirm").addEventListener("click", () => {
+      auth.logout();
+      window.location.href = "/";
+    });
+  }
+</script>

@@ -1,0 +1,224 @@
+/* ===========================================
+   SELECT POOLS PAGE STYLES
+   =========================================== */
+
+.pools-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.pools-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.pools-header h1 {
+  color: var(--color-text);
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.pools-header p {
+  color: var(--color-text-light);
+  font-size: var(--font-size-lg);
+}
+
+/* Pools List */
+.pools-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Pool Card */
+.pool-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.pool-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.pool-info {
+  flex-grow: 1;
+}
+
+.pool-name {
+  font-size: var(--font-size-xl);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.pool-details {
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.pool-detail {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.pool-detail i {
+  color: var(--color-primary);
+  width: 16px;
+}
+
+/* Submit Container */
+.submit-container {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+}
+
+.join-button {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.join-button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.join-button:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+}
+
+/* No Pools */
+.no-pools {
+  text-align: center;
+  color: var(--color-text-light);
+  padding: 40px;
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+}
+
+/* Section Divider */
+.section-divider {
+  display: flex;
+  align-items: center;
+  margin: 40px 0;
+  color: var(--color-text-muted);
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section-divider span {
+  padding: 0 var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+/* Create Pool Section */
+.create-pool-section {
+  background: var(--color-white);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 30px;
+}
+
+.create-pool-section h2 {
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-xl);
+}
+
+.create-pool-section > p {
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Form Row */
+.form-row {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-row label {
+  display: block;
+  color: var(--color-text-light);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.form-row input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  box-sizing: border-box;
+}
+
+.form-row input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.1);
+}
+
+/* Date Row */
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+/* Create Button */
+.create-button {
+  background-color: var(--color-success);
+  color: var(--color-white);
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.create-button:hover {
+  background-color: #2f855a;
+}
+
+/* Success Message */
+.success-message {
+  background: var(--color-success-light);
+  color: #276749;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  display: none;
+}
+
+/* Error Message */
+.error-message {
+  color: var(--color-error);
+  margin-top: 5px;
+  font-size: var(--font-size-sm);
+  display: none;
+}

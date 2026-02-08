@@ -3,24 +3,547 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>College Football Playoff Pick'em</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>9X9 NFL Playoff Pool</title>
+    <link rel="stylesheet" href="styles/base.css" />
     <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
   </head>
-  <body>
-    <nav class="navbar">
-      <div class="nav-brand">CFP Pick'em</div>
-      <div class="nav-links">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/picks" class="nav-link">My Picks</a>
-        <a href="/leaderboard" class="nav-link">Leaderboard</a>
-        <a href="/login" class="nav-link" id="loginBtn">Login</a>
-      </div>
-    </nav>
 
-    <div id="main-content">
-      <!-- Content will be dynamically loaded here -->
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="main-content">
+      <!-- Content will be dynamically inserted here -->
     </div>
 
-    <script src="src/app.js"></script>
+    <div id="successMessage" class="success-message" style="display: none">
+      Account successfully created! Welcome to 9X9 NFL Playoff Pool.
+    </div>
+
+    <!-- Guest View -->
+    <div id="loggedOutContent" class="guest-content">
+      <section class="hero-section">
+        <h1 class="hero-title">Welcome to 9X9 Playoff Pools!</h1>
+        <p class="hero-subtitle">
+          Enjoy the excitement of the playoffs with our unique confidence pool
+          format
+        </p>
+        <div class="cta-buttons">
+          <a href="register.html" class="cta-button cta-primary">
+            Sign Up Now
+          </a>
+          <button
+            onclick="window.showLoginModal()"
+            class="cta-button cta-secondary"
+          >
+            Sign In
+          </button>
+        </div>
+      </section>
+
+      <section class="features-section">
+        <h2>Why Join Our Pool?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <i class="fas fa-trophy feature-icon"></i>
+            <h3>Confidence Points System</h3>
+            <p>
+              Rank your picks by confidence level, making every game more
+              exciting
+            </p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-users feature-icon"></i>
+            <h3>Community Experience</h3>
+            <p>Compete with friends and track everyone's picks in real-time</p>
+          </div>
+          <div class="feature-card">
+            <i class="fas fa-mobile-alt feature-icon"></i>
+            <h3>Easy to Use</h3>
+            <p>
+              Simple, intuitive interface for making and tracking your playoff
+              picks
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Authenticated User View - No Pool -->
+    <div id="noPoolContent" class="auth-content" style="display: none">
+      <div class="dashboard-container">
+        <div class="welcome-section" style="text-align: center; padding: 60px 20px;">
+          <h1>Welcome to 9X9 Playoff Pools!</h1>
+          <p style="font-size: 1.2em; color: #666; margin: 20px 0;">You're not in any pools yet. Join one to start making picks!</p>
+          <a href="select-pools.html" class="cta-button cta-primary" style="display: inline-block; margin-top: 20px; padding: 15px 40px; font-size: 1.2em;">Join a Pool</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authenticated User View - Has Pool -->
+    <div id="hasPoolContent" class="auth-content" style="display: none">
+      <div class="dashboard-hero">
+        <div class="hero-overlay">
+          <h1>NFL Playoff Pool</h1>
+          <p>Track your picks, climb the standings</p>
+        </div>
+      </div>
+      <div class="dashboard-container">
+
+        <div class="card-grid">
+          <!-- Your Pools Card -->
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h2 class="card-title">Your Pools</h2>
+            </div>
+            <div class="card-content">
+              <div id="userPoolsList" class="user-pools-list"></div>
+            </div>
+            <div class="card-actions">
+              <a href="select-pools.html" class="action-button secondary-action">Join Another Pool</a>
+            </div>
+          </div>
+
+          <!-- Your Picks Card -->
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h2 class="card-title">Your Picks</h2>
+            </div>
+            <div class="card-content">
+              <div id="picksStatus" class="picks-status"></div>
+            </div>
+            <div class="card-actions">
+              <div id="picksActionButton"></div>
+            </div>
+          </div>
+
+          <!-- Games Card -->
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h2 class="card-title" id="gamesCardTitle">Upcoming Games</h2>
+            </div>
+            <div class="card-content">
+              <div id="gamesContent" class="games-list"></div>
+            </div>
+            <div class="card-actions">
+              <a href="picks-summary.html" class="action-button secondary-action">View All Picks</a>
+            </div>
+          </div>
+
+          <!-- Standings Card -->
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h2 class="card-title">Standings</h2>
+            </div>
+            <div class="card-content">
+              <div id="standingsSummary" class="standings-summary">
+                <p>Loading standings...</p>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="standings.html" class="action-button primary-action">View Standings</a>
+            </div>
+          </div>
+
+          <!-- Admin Card (hidden by default, shown for pool admins) -->
+          <div id="adminCard" class="dashboard-card" style="display: none;">
+            <div class="card-header">
+              <h2 class="card-title">Pool Admin</h2>
+            </div>
+            <div class="card-content">
+              <p>Manage games, participants, and picks for your pools.</p>
+            </div>
+            <div class="card-actions">
+              <a href="admin.html" class="action-button primary-action">Go to Admin</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+
+      function getOrdinal(n) {
+        const s = ["th", "st", "nd", "rd"];
+        const v = n % 100;
+        return n + (s[(v - 20) % 10] || s[v] || s[0]);
+      }
+
+      async function initializePage() {
+        try {
+          await loadNavbar();
+
+          const mainContent = document.querySelector(".main-content");
+          if (!mainContent) {
+            console.error("Main content container not found");
+            return;
+          }
+
+          // Check authentication and load appropriate content
+          if (auth.isAuthenticated()) {
+            await loadUserDashboard();
+          } else {
+            showGuestContent();
+          }
+        } catch (error) {
+          console.error("Error initializing page:", error);
+        }
+      }
+
+      async function loadUserDashboard() {
+        try {
+          const token = localStorage.getItem("token");
+          const userData = JSON.parse(localStorage.getItem("user"));
+
+          if (!token || !userData) {
+            console.log("No token or user data found, showing guest content");
+            showGuestContent();
+            return;
+          }
+
+          // Hide guest content
+          document.getElementById("loggedOutContent").style.display = "none";
+
+          // Fetch user's pool data
+          const response = await fetch(
+            `${API_URL}/api/participants/${userData.id}/pools`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            // If 404, user might have been deleted - clear session and show guest
+            if (response.status === 404 || response.status === 401) {
+              console.log("User not found or unauthorized, clearing session");
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              showGuestContent();
+              return;
+            }
+            throw new Error("Failed to fetch pool data");
+          }
+
+          const poolData = await response.json();
+
+          // Check if user has pools
+          if (!poolData.pools || poolData.pools.length === 0) {
+            // Show "no pool" content
+            document.getElementById("noPoolContent").style.display = "block";
+            document.getElementById("hasPoolContent").style.display = "none";
+            return;
+          }
+
+          // User has pools - show dashboard
+          document.getElementById("noPoolContent").style.display = "none";
+          document.getElementById("hasPoolContent").style.display = "block";
+
+          // Display user's pools with status (active pools first)
+          const sortedPools = [...poolData.pools].sort((a, b) => {
+            if (a.isActive && !b.isActive) return -1;
+            if (!a.isActive && b.isActive) return 1;
+            return 0;
+          });
+
+          const poolsListHtml = sortedPools.map(pool => {
+            let statusLabel = pool.isActive ? "Active" : "Inactive";
+            let statusClass = pool.isActive ? "status-active" : "status-inactive";
+
+            return `
+              <div class="pool-item">
+                <span class="pool-name">${pool.name}</span>
+                <span class="pool-status ${statusClass}">${statusLabel}</span>
+              </div>
+            `;
+          }).join("");
+
+          document.getElementById("userPoolsList").innerHTML = poolsListHtml;
+
+          // Fetch picks status for the active pool (or first pool as fallback)
+          if (poolData.pools.length > 0) {
+            const activePool = poolData.pools.find(p => p.isActive) || poolData.pools[0];
+            const picksResponse = await fetch(
+              `${API_URL}/api/picks/status/${activePool.poolId}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            // Fetch all games for the pool
+            const gamesResponse = await fetch(
+              `${API_URL}/api/games/pool/${activePool.poolId}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            let allGames = [];
+            if (gamesResponse.ok) {
+              allGames = await gamesResponse.json();
+            }
+
+            if (picksResponse.ok) {
+              const picksData = await picksResponse.json();
+
+              // If picks are made, fetch and show actual picks with game results
+              if (picksData.picksMade > 0) {
+                const actualPicksResponse = await fetch(
+                  `${API_URL}/api/picks/pool/${activePool.poolId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+
+                if (actualPicksResponse.ok) {
+                  const actualPicks = await actualPicksResponse.json();
+                  const pickedGameIds = new Set(actualPicks.map(p => p.gameId.toString()));
+
+                  // Find games needing picks (not yet picked, not complete)
+                  const gamesNeedingPicks = allGames.filter(g =>
+                    !pickedGameIds.has(g._id.toString()) && !g.isComplete
+                  );
+
+                  // Separate picks into pending (no results) and completed (has results)
+                  const pendingPicks = [];
+                  const completedPicks = [];
+
+                  actualPicks.forEach(pick => {
+                    // Use string comparison for IDs
+                    const game = allGames.find(g => g._id.toString() === pick.gameId.toString());
+                    if (game && game.isComplete) {
+                      completedPicks.push({ ...pick, game });
+                    } else if (game) {
+                      pendingPicks.push({ ...pick, game });
+                    }
+                  });
+
+                  // Sort each group by game time (to match Upcoming Games order)
+                  gamesNeedingPicks.sort((a, b) => new Date(a.gameTime) - new Date(b.gameTime));
+                  pendingPicks.sort((a, b) => new Date(a.game?.gameTime) - new Date(b.game?.gameTime));
+                  completedPicks.sort((a, b) => new Date(a.game?.gameTime) - new Date(b.game?.gameTime));
+
+                  // Build HTML for games needing picks
+                  const needsPicksHtml = gamesNeedingPicks.length > 0 ? `
+                    <div class="picks-group">
+                      <h4 class="picks-group-title">Needs Picks</h4>
+                      ${gamesNeedingPicks.map(game => `
+                        <div class="dashboard-pick-item needs-pick">
+                          <span class="pick-team">${game.awayTeam} @ ${game.homeTeam}</span>
+                        </div>
+                      `).join("")}
+                    </div>
+                  ` : "";
+
+                  // Build HTML for pending picks (awaiting results)
+                  const pendingHtml = pendingPicks.length > 0 ? `
+                    <div class="picks-group">
+                      <h4 class="picks-group-title">Awaiting Results</h4>
+                      ${pendingPicks.map(pick => `
+                        <div class="dashboard-pick-item">
+                          <span class="pick-team">${pick.selectedTeam}</span>
+                          <span class="pick-points">${pick.confidencePoints} pts</span>
+                        </div>
+                      `).join("")}
+                    </div>
+                  ` : "";
+
+                  // Build HTML for completed picks
+                  const completedHtml = completedPicks.length > 0 ? `
+                    <div class="picks-group">
+                      <h4 class="picks-group-title">Results</h4>
+                      ${completedPicks.map(pick => {
+                        const pickClass = pick.game.winner === pick.selectedTeam ? "pick-win" : "pick-loss";
+                        return `
+                          <div class="dashboard-pick-item ${pickClass}">
+                            <span class="pick-team">${pick.selectedTeam}</span>
+                            <span class="pick-points">${pick.confidencePoints}</span>
+                          </div>
+                        `;
+                      }).join("")}
+                    </div>
+                  ` : "";
+
+                  document.getElementById("picksStatus").innerHTML = `
+                    <div class="dashboard-picks-list">
+                      ${needsPicksHtml}
+                      ${pendingHtml}
+                      ${completedHtml}
+                    </div>
+                  `;
+
+                  // Update action button - "Make Picks" if games need picks, "View Picks" otherwise
+                  const hasGamesNeedingPicks = gamesNeedingPicks.length > 0;
+                  document.getElementById("picksActionButton").innerHTML = hasGamesNeedingPicks
+                    ? `<a href="/make-picks.html?poolId=${activePool.poolId}" class="action-button primary-action">Make Picks</a>`
+                    : `<a href="/picks-summary.html" class="action-button primary-action">View Picks</a>`;
+                } else {
+                  document.getElementById("picksStatus").innerHTML = `
+                    <p>Picks made but unable to load details.</p>
+                  `;
+                }
+              } else {
+                // No picks made at all - show games needing picks
+                const gamesNeedingPicks = allGames.filter(g => !g.isComplete);
+
+                document.getElementById("picksStatus").innerHTML = `
+                  <div class="dashboard-picks-list">
+                    <div class="picks-group">
+                      <h4 class="picks-group-title">Needs Picks</h4>
+                      ${gamesNeedingPicks.map(game => `
+                        <div class="dashboard-pick-item needs-pick">
+                          <span class="pick-team">${game.awayTeam} @ ${game.homeTeam}</span>
+                        </div>
+                      `).join("")}
+                    </div>
+                  </div>
+                `;
+
+                document.getElementById("picksActionButton").innerHTML = `
+                  <a href="/make-picks.html?poolId=${activePool.poolId}"
+                     class="action-button primary-action">
+                    Make Picks
+                  </a>
+                `;
+              }
+            }
+
+            // Display games - separate into upcoming and completed
+            const upcomingGames = allGames.filter(g => !g.isComplete);
+            const completedGames = allGames.filter(g => g.isComplete);
+
+            const gamesCardTitle = document.getElementById("gamesCardTitle");
+            const gamesContent = document.getElementById("gamesContent");
+
+            if (upcomingGames.length > 0) {
+              // Show upcoming games
+              gamesCardTitle.textContent = "Upcoming Games";
+              gamesContent.innerHTML = upcomingGames
+                .map(game => `
+                  <div class="game-item">
+                    <div class="game-matchup">${game.awayTeam} @ ${game.homeTeam}</div>
+                    <div class="game-details">
+                      <span class="game-date">${new Date(game.gameTime).toLocaleDateString()} ${new Date(game.gameTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                      <span class="game-network">${game.tvNetwork || ''}</span>
+                    </div>
+                  </div>
+                `).join("");
+            } else if (completedGames.length > 0) {
+              // All games complete - show past games with results
+              gamesCardTitle.textContent = "Past Games";
+              gamesContent.innerHTML = `
+                <div class="past-games-scroll">
+                  ${completedGames.map(game => `
+                    <div class="game-item completed">
+                      <div class="game-title">${game.gameTitle}</div>
+                      <div class="game-matchup">
+                        <span class="${game.winner === game.awayTeam ? 'winner' : ''}">${game.awayTeam}</span>
+                        <span class="at-symbol">@</span>
+                        <span class="${game.winner === game.homeTeam ? 'winner' : ''}">${game.homeTeam}</span>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              `;
+            } else {
+              gamesContent.innerHTML = "<p>No games scheduled</p>";
+            }
+
+            // Fetch standings for user summary
+            const standingsResponse = await fetch(`${API_URL}/api/pool/standings`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (standingsResponse.ok) {
+              const standingsData = await standingsResponse.json();
+              const currentUserId = userData.id;
+
+              // Find current user in standings
+              const userStanding = standingsData.standings.find(
+                s => s.odataId === currentUserId || s.odataId?.toString() === currentUserId
+              );
+
+              const totalParticipants = standingsData.standings.length;
+
+              if (userStanding) {
+                // Calculate remaining points and max possible ranking
+                const remainingPoints = userStanding.possiblePoints - userStanding.earnedPoints;
+                const maxPossible = userStanding.possiblePoints;
+
+                // Sort by maximum possible points to find rank
+                const sortedByMaxPossible = [...standingsData.standings].sort(
+                  (a, b) => b.possiblePoints - a.possiblePoints
+                );
+                const maxPossibleRank = sortedByMaxPossible.findIndex(
+                  s => s.odataId === currentUserId || s.odataId?.toString() === currentUserId
+                ) + 1;
+                document.getElementById("standingsSummary").innerHTML = `
+                  <div class="standings-info">
+                    <p class="standing-rank">You are currently in <strong>${getOrdinal(userStanding.rank)} place</strong> out of ${totalParticipants} participants with <strong>${userStanding.earnedPoints} points</strong>.</p>
+                    <p class="standing-remaining">With <strong>${remainingPoints} points</strong> remaining, your maximum possible is <strong>${maxPossible}</strong>, which is the <strong>${getOrdinal(maxPossibleRank)} highest</strong>.</p>
+                    <p class="standing-luck">Good luck!</p>
+                  </div>
+                `;
+              } else {
+                document.getElementById("standingsSummary").innerHTML = `
+                  <p>Make your picks to see your standing!</p>
+                `;
+              }
+            }
+          }
+
+          // Check if user is admin of any pools and show admin card
+          try {
+            const adminResponse = await fetch(`${API_URL}/api/pools/admin`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (adminResponse.ok) {
+              const adminPools = await adminResponse.json();
+              if (adminPools.length > 0) {
+                document.getElementById("adminCard").style.display = "block";
+              }
+            }
+          } catch (adminErr) {
+            console.log("Error checking admin status:", adminErr);
+          }
+        } catch (error) {
+          console.error("Error loading dashboard:", error);
+          // On error, show the no pool content with an error message
+          document.getElementById("noPoolContent").style.display = "block";
+          document.getElementById("hasPoolContent").style.display = "none";
+        }
+      }
+
+      function showGuestContent() {
+        document.getElementById("loggedOutContent").style.display = "block";
+        document.getElementById("noPoolContent").style.display = "none";
+        document.getElementById("hasPoolContent").style.display = "none";
+      }
+
+      function showError(message) {
+        const mainContent = document.querySelector(".main-content");
+        mainContent.innerHTML = `
+          <div class="error-message">
+            <p>${message}</p>
+            <button onclick="location.reload()" class="retry-button">Retry</button>
+          </div>
+        `;
+      }
+
+      document.addEventListener("DOMContentLoaded", initializePage);
+    </script>
+
+    <script type="module" src="./src/app.js"></script>
+
+    <script type="module" src="./src/dashboard.js"></script>
   </body>
 </html>

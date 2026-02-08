@@ -1,0 +1,406 @@
+/* Navbar container */
+.nav-container {
+  z-index: 999;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Add padding to body to account for fixed navbar */
+body {
+  padding-top: 80px;
+}
+
+/* Main navbar styles */
+.navbar {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 64px;
+}
+
+.navbar-brand a {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  text-decoration: none;
+}
+
+.navbar-menu,
+.navbar-end {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 100%;
+}
+
+.navbar-menu a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #4a5568;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+  padding: 0 0.5rem;
+}
+
+.navbar-menu a:hover {
+  color: #6b46c1;
+}
+
+.navbar-menu a.active {
+  color: #6b46c1;
+  border-bottom: 2px solid #6b46c1;
+}
+
+.navbar-end {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  height: 100%;
+  position: relative;
+}
+
+/* Ensure proper spacing for content */
+body {
+  margin: 0;
+  background-color: #f7fafc;
+}
+
+/* Container adjustments */
+.container {
+  margin-top: 20px;
+}
+
+/* Profile dropdown styles */
+.profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+}
+
+.profile-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: #4a5568;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.profile-button:hover {
+  color: #2d3748;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.modal-overlay[style*="display: none"] {
+  display: none !important;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.error-message {
+  color: #e53e3e;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.modal-header {
+  margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.5rem;
+}
+
+.modal-body {
+  margin-bottom: 1.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  min-width: 80px;
+}
+
+.modal-confirm {
+  background-color: #6b46c1;
+  color: white;
+}
+
+.modal-confirm:hover {
+  background-color: #553c9a;
+}
+
+/* Destructive action buttons (like logout) */
+.modal-confirm.destructive {
+  background-color: #e53e3e;
+}
+
+.modal-confirm.destructive:hover {
+  background-color: #c53030;
+}
+
+.modal-cancel {
+  background-color: #e2e8f0;
+  color: #2d3748;
+}
+
+.modal-cancel:hover {
+  background-color: #cbd5e0;
+}
+
+/* Dropdown menu items */
+.profile-dropdown a,
+.profile-dropdown button {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #4a5568;
+  text-decoration: none;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.profile-dropdown a:hover,
+.profile-dropdown button:hover {
+  background-color: #f7fafc;
+  color: #2d3748;
+}
+
+/* Divider in dropdown */
+.dropdown-divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 0.5rem 0;
+}
+
+/* Update profile button container positioning */
+.user-info {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Auth buttons styling */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.login-button {
+  background: none;
+  border: 1px solid #e2e8f0;
+  color: #4a5568;
+}
+
+.login-button:hover {
+  background-color: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.register-button {
+  background-color: #6b46c1;
+  color: white;
+  border: none;
+}
+
+.register-button:hover {
+  background-color: #553c9a;
+}
+
+/* Profile button styling */
+.profile-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: #4a5568;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.profile-button:hover {
+  color: #2d3748;
+}
+
+/* Profile dropdown styling */
+.profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+}
+
+.profile-dropdown.show {
+  display: block;
+}
+
+/* Profile dropdown container */
+.navbar-end {
+  position: relative;
+}
+
+/* Profile button styling */
+.profile-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  color: #4a5568;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 1rem;
+  height: 100%;
+}
+
+/* Profile dropdown menu */
+.profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+}
+
+/* Show dropdown when active */
+.profile-dropdown.show {
+  display: block;
+}
+
+/* Dropdown items */
+.profile-dropdown a,
+.profile-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #4a5568;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.profile-dropdown a:hover,
+.profile-dropdown button:hover {
+  background-color: #f7fafc;
+  color: #2d3748;
+}
+
+/* Divider in dropdown */
+.dropdown-divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 0.5rem 0;
+}

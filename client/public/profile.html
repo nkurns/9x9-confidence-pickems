@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>9X9 NFL Playoff Pool - Profile</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/profile.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="container">
+      <div class="profile-header">
+        <h1>Profile Settings</h1>
+      </div>
+
+      <div class="profile-content">
+        <!-- Profile Image Section -->
+        <div class="profile-image-section">
+          <div id="avatarDisplay" class="avatar-display">
+            <!-- Avatar will be rendered here -->
+          </div>
+          <div class="profile-image-actions">
+            <label for="profileImageInput" class="upload-button">
+              <i class="fas fa-camera"></i> Change Photo
+            </label>
+            <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+            <button type="button" id="removeImageBtn" class="remove-image-button" style="display: none;">
+              <i class="fas fa-trash"></i> Remove
+            </button>
+          </div>
+          <p class="image-hint">Max 2MB. JPG, PNG, GIF, or WebP.</p>
+        </div>
+
+        <form id="profileForm" class="profile-form">
+          <div class="form-group">
+            <label>Username</label>
+            <div class="username-display"></div>
+          </div>
+
+          <!-- Editable fields -->
+          <div class="form-group">
+            <label for="displayName">Display Name</label>
+            <div class="input-group">
+              <input type="text" id="displayName" class="editable-field" />
+              <span
+                class="modified-indicator"
+                id="displayName-modified"
+                style="display: none"
+                >*</span
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <div class="input-group">
+              <input type="email" id="email" class="editable-field" />
+              <span
+                class="modified-indicator"
+                id="email-modified"
+                style="display: none"
+                >*</span
+              >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="location">Location</label>
+            <div class="input-group">
+              <input type="text" id="location" class="editable-field" />
+              <span
+                class="modified-indicator"
+                id="location-modified"
+                style="display: none"
+                >*</span
+              >
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="submit"
+              id="updateButton"
+              class="update-button"
+              style="display: none"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+
+        <div class="profile-section">
+          <h2>Your Pools</h2>
+          <div id="profilePoolsList" class="user-pools-list">
+            <p class="loading-text">Loading pools...</p>
+          </div>
+          <div class="section-actions">
+            <a href="select-pools.html" class="action-link">Join or Create a Pool</a>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h2>Family Members / Dependents</h2>
+          <p class="section-description">Add family members who don't have their own email. You can make picks on their behalf.</p>
+          <div id="dependentsList" class="dependents-list">
+            <p class="loading-text">Loading...</p>
+          </div>
+          <div class="add-dependent-form">
+            <input type="text" id="newDependentName" placeholder="Enter name (e.g., Son's name)" maxlength="50" />
+            <button type="button" id="addDependentBtn" class="add-dependent-button">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+      import { getAvatarHtml } from "./src/profileHelpers.js";
+
+      let originalData = {};
+      let currentProfileImage = null;
+
+      async function initializePage() {
+        try {
+          await loadNavbar();
+
+          if (!auth.isAuthenticated()) {
+            // Check if we need to refresh the token
+            const refreshed = await auth.refreshToken();
+            if (!refreshed) {
+              window.location.href = "/";
+              return;
+            }
+          }
+
+          // Load participant data
+          const token = localStorage.getItem("token");
+          console.log("Fetching profile with token:", token);
+          const response = await fetch(`${API_URL}/api/participants/profile`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          console.log("Profile response:", response);
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Profile fetch error:", errorData);
+            console.log("Response status:", response.status);
+            console.log(
+              "Response headers:",
+              Object.fromEntries(response.headers)
+            );
+            throw new Error(
+              `Failed to fetch profile data: ${
+                errorData.message || "Unknown error"
+              } (${response.status})`
+            );
+          }
+
+          const participantData = await response.json();
+          console.log("Received participant data:", participantData);
+          originalData = { ...participantData };
+          currentProfileImage = participantData.profileImage;
+
+          // Render avatar
+          renderAvatar(participantData);
+
+          // Populate form fields
+          document.querySelector(".username-display").textContent =
+            participantData.username;
+          document.getElementById("displayName").value =
+            participantData.displayName || "";
+          document.getElementById("email").value = participantData.email || "";
+          document.getElementById("location").value =
+            participantData.location || "";
+
+          // Set up event listeners for editable fields and image upload
+          setupFieldListeners();
+          setupImageUpload();
+
+          // Load user's pools
+          await loadUserPools();
+
+          // Load dependents
+          await loadDependents();
+          setupDependentListeners();
+        } catch (error) {
+          console.error("Error initializing profile page:", error);
+          showAlert("Error loading profile data", true);
+        }
+      }
+
+      async function loadUserPools() {
+        try {
+          const token = localStorage.getItem("token");
+          const userData = JSON.parse(localStorage.getItem("user"));
+
+          const response = await fetch(`${API_URL}/api/participants/${userData.id}/pools`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch pools");
+          }
+
+          const poolData = await response.json();
+          const poolsList = document.getElementById("profilePoolsList");
+
+          if (!poolData.pools || poolData.pools.length === 0) {
+            poolsList.innerHTML = `<p class="no-pools-text">You haven't joined any pools yet.</p>`;
+            return;
+          }
+
+          const poolsHtml = poolData.pools.map(pool => {
+            const now = new Date();
+            const startDate = new Date(pool.startDate || pool.joinedAt);
+            const endDate = new Date(pool.endDate || now);
+
+            let statusLabel = "Active";
+            let statusClass = "status-active";
+
+            if (endDate < now) {
+              statusLabel = "Complete";
+              statusClass = "status-complete";
+            } else if (startDate > now) {
+              statusLabel = "Upcoming";
+              statusClass = "status-upcoming";
+            }
+
+            return `
+              <div class="pool-item">
+                <span class="pool-name">${pool.name}</span>
+                <span class="pool-status ${statusClass}">${statusLabel}</span>
+              </div>
+            `;
+          }).join("");
+
+          poolsList.innerHTML = poolsHtml;
+        } catch (error) {
+          console.error("Error loading pools:", error);
+          document.getElementById("profilePoolsList").innerHTML =
+            `<p class="error-text">Error loading pools</p>`;
+        }
+      }
+
+      function setupFieldListeners() {
+        const editableFields = ["displayName", "email", "location"];
+
+        editableFields.forEach((fieldId) => {
+          const input = document.getElementById(fieldId);
+          input.addEventListener("input", () => checkForChanges());
+        });
+
+        document
+          .getElementById("profileForm")
+          .addEventListener("submit", handleProfileUpdate);
+      }
+
+      function checkForChanges() {
+        const fields = ["displayName", "email", "location"];
+        let hasChanges = false;
+
+        fields.forEach((field) => {
+          const input = document.getElementById(field);
+          const modified = input.value !== (originalData[field] || "");
+          document.getElementById(`${field}-modified`).style.display = modified
+            ? "inline"
+            : "none";
+          if (modified) hasChanges = true;
+        });
+
+        document.getElementById("updateButton").style.display = hasChanges
+          ? "block"
+          : "none";
+      }
+
+      async function handleProfileUpdate(event) {
+        event.preventDefault();
+
+        const displayName = document.getElementById("displayName").value;
+        const email = document.getElementById("email").value;
+        const location = document.getElementById("location").value;
+
+        // Validation
+        if (
+          displayName &&
+          (displayName.length < 2 || displayName.length > 50)
+        ) {
+          showAlert("Display name must be between 2 and 50 characters", true);
+          return;
+        }
+
+        if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+          showAlert("Please enter a valid email address", true);
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const updateData = {
+            displayName,
+            email,
+            location,
+          };
+
+          const response = await fetch(`${API_URL}/api/participants/profile`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(updateData),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to update profile");
+          }
+
+          const updatedParticipant = await response.json();
+          originalData = { ...updatedParticipant };
+
+          // Update local storage
+          const currentUser = JSON.parse(localStorage.getItem("user"));
+          const newUserData = { ...currentUser, ...updatedParticipant };
+          localStorage.setItem("user", JSON.stringify(newUserData));
+
+          // Reset modification indicators
+          document
+            .querySelectorAll(".modified-indicator")
+            .forEach((indicator) => {
+              indicator.style.display = "none";
+            });
+          document.getElementById("updateButton").style.display = "none";
+
+          showAlert("Profile updated successfully");
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          showAlert("Error updating profile", true);
+        }
+      }
+
+      function showAlert(message, isError = false) {
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert ${
+          isError ? "alert-error" : "alert-success"
+        }`;
+        alertDiv.textContent = message;
+        document.querySelector(".profile-content").prepend(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
+      }
+
+      function renderAvatar(participantData) {
+        const avatarDisplay = document.getElementById("avatarDisplay");
+        avatarDisplay.innerHTML = getAvatarHtml(participantData, 120);
+
+        // Show/hide remove button based on whether image exists
+        const removeBtn = document.getElementById("removeImageBtn");
+        removeBtn.style.display = participantData.profileImage ? "inline-flex" : "none";
+      }
+
+      function setupImageUpload() {
+        const fileInput = document.getElementById("profileImageInput");
+        const removeBtn = document.getElementById("removeImageBtn");
+
+        fileInput.addEventListener("change", async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          // Validate file size (2MB max)
+          if (file.size > 2 * 1024 * 1024) {
+            showAlert("Image must be less than 2MB", true);
+            return;
+          }
+
+          // Validate file type
+          if (!file.type.match(/^image\/(jpeg|jpg|png|gif|webp)$/)) {
+            showAlert("Please select a valid image file", true);
+            return;
+          }
+
+          try {
+            const token = localStorage.getItem("token");
+            const formData = new FormData();
+            formData.append("profileImage", file);
+
+            const response = await fetch(`${API_URL}/api/participants/profile/image`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: formData,
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to upload image");
+            }
+
+            const result = await response.json();
+            currentProfileImage = result.profileImage;
+
+            // Update avatar display
+            renderAvatar({
+              ...originalData,
+              profileImage: result.profileImage,
+            });
+
+            // Update local storage
+            const currentUser = JSON.parse(localStorage.getItem("user"));
+            currentUser.profileImage = result.profileImage;
+            localStorage.setItem("user", JSON.stringify(currentUser));
+
+            showAlert("Profile image updated successfully");
+          } catch (error) {
+            console.error("Error uploading image:", error);
+            showAlert("Error uploading image", true);
+          }
+
+          // Clear the input
+          fileInput.value = "";
+        });
+
+        removeBtn.addEventListener("click", async () => {
+          if (!confirm("Remove your profile picture?")) return;
+
+          try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API_URL}/api/participants/profile/image`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to remove image");
+            }
+
+            currentProfileImage = null;
+
+            // Update avatar display
+            renderAvatar({
+              ...originalData,
+              profileImage: null,
+            });
+
+            // Update local storage
+            const currentUser = JSON.parse(localStorage.getItem("user"));
+            delete currentUser.profileImage;
+            localStorage.setItem("user", JSON.stringify(currentUser));
+
+            showAlert("Profile image removed");
+          } catch (error) {
+            console.error("Error removing image:", error);
+            showAlert("Error removing image", true);
+          }
+        });
+      }
+
+      // ==========================================
+      // DEPENDENTS MANAGEMENT
+      // ==========================================
+
+      async function loadDependents() {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/participants/dependents`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch dependents");
+          }
+
+          const dependents = await response.json();
+          renderDependentsList(dependents);
+        } catch (error) {
+          console.error("Error loading dependents:", error);
+          document.getElementById("dependentsList").innerHTML =
+            `<p class="error-text">Error loading dependents</p>`;
+        }
+      }
+
+      function renderDependentsList(dependents) {
+        const listContainer = document.getElementById("dependentsList");
+
+        if (!dependents || dependents.length === 0) {
+          listContainer.innerHTML = `<p class="no-dependents-text">No family members added yet.</p>`;
+          return;
+        }
+
+        const html = dependents.map(dep => `
+          <div class="dependent-item" data-id="${dep._id}">
+            <div class="dependent-info">
+              ${getAvatarHtml({ displayName: dep.displayName }, 36)}
+              <span class="dependent-name">${dep.displayName}</span>
+            </div>
+            <button class="remove-dependent-btn" data-id="${dep._id}" title="Remove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `).join("");
+
+        listContainer.innerHTML = html;
+
+        // Add event listeners for remove buttons
+        listContainer.querySelectorAll(".remove-dependent-btn").forEach(btn => {
+          btn.addEventListener("click", () => removeDependent(btn.dataset.id));
+        });
+      }
+
+      function setupDependentListeners() {
+        const addBtn = document.getElementById("addDependentBtn");
+        const nameInput = document.getElementById("newDependentName");
+
+        addBtn.addEventListener("click", () => addDependent());
+
+        // Also submit on Enter key
+        nameInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addDependent();
+          }
+        });
+      }
+
+      async function addDependent() {
+        const nameInput = document.getElementById("newDependentName");
+        const name = nameInput.value.trim();
+
+        if (!name || name.length < 2) {
+          showAlert("Please enter a name (at least 2 characters)", true);
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/participants/dependents`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ displayName: name }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to add dependent");
+          }
+
+          const newDependent = await response.json();
+          nameInput.value = "";
+
+          // Reload the list
+          await loadDependents();
+          showAlert(`${newDependent.displayName} added successfully`);
+        } catch (error) {
+          console.error("Error adding dependent:", error);
+          showAlert(error.message || "Error adding dependent", true);
+        }
+      }
+
+      async function removeDependent(dependentId) {
+        const listContainer = document.getElementById("dependentsList");
+        const item = listContainer.querySelector(`[data-id="${dependentId}"]`);
+        const name = item?.querySelector(".dependent-name")?.textContent || "this person";
+
+        if (!confirm(`Remove ${name}? Their picks will no longer appear in standings.`)) {
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_URL}/api/participants/dependents/${dependentId}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to remove dependent");
+          }
+
+          await loadDependents();
+          showAlert(`${name} removed`);
+        } catch (error) {
+          console.error("Error removing dependent:", error);
+          showAlert("Error removing dependent", true);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", initializePage);
+    </script>
+  </body>
+</html>

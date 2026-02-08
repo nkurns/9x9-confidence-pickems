@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>9X9 NFL Playoff Pool - Standings</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link rel="stylesheet" href="styles/picks.css" />
+    <link rel="stylesheet" href="styles/standings.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="picks-container">
+      <div class="page-header">
+        <h1>Standings</h1>
+        <p id="poolName" class="pool-subtitle">Loading pool...</p>
+        <p id="gamesStats" class="games-stats">Loading games stats...</p>
+      </div>
+
+      <div class="standings-content">
+        <div class="standings-table-container">
+          <table class="standings-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th class="sortable" data-sort="points" data-order="desc">
+                  Points <span class="sort-indicator"></span>
+                </th>
+                <th class="sortable" data-sort="possible" data-order="desc">
+                  Max Possible <span class="sort-indicator"></span>
+                </th>
+                <th>Correct</th>
+              </tr>
+            </thead>
+            <tbody id="standings-body">
+              <!-- Will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div class="chart-container">
+          <canvas id="standingsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+      import { getAvatarHtml } from "./src/profileHelpers.js";
+
+      let standingsData = null;
+      let currentSort = { field: null, order: null };
+
+      async function initializePage() {
+        try {
+          await loadNavbar();
+
+          if (!auth.isAuthenticated()) {
+            window.location.href = "/";
+            return;
+          }
+
+          const token = localStorage.getItem("token");
+          console.log("Fetching standings data...");
+          const response = await fetch(`${API_URL}/api/pool/standings`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.error("Failed to fetch standings:", response.status);
+            throw new Error("Failed to fetch standings");
+          }
+
+          standingsData = await response.json();
+          console.log("Received standings data:", standingsData);
+
+          // Update pool name
+          document.getElementById("poolName").textContent = standingsData.poolName;
+
+          // Update games stats
+          document.getElementById(
+            "gamesStats"
+          ).textContent = `${standingsData.completedGames} of ${standingsData.totalGames} games completed`;
+
+          // Populate standings table
+          if (!standingsData.standings || standingsData.standings.length === 0) {
+            document.getElementById("standings-body").innerHTML = `
+              <tr>
+                <td colspan="5" class="no-data">No standings data available yet</td>
+              </tr>
+            `;
+            return;
+          }
+
+          renderTable(standingsData.standings);
+
+          // Set up sortable headers
+          setupSortableHeaders();
+
+          // Render the chart
+          renderStandingsChart(standingsData.standings, standingsData.totalAvailablePoints);
+        } catch (error) {
+          console.error("Error initializing page:", error);
+          document.getElementById("standings-body").innerHTML = `
+            <tr>
+              <td colspan="5" class="error">Error loading standings data</td>
+            </tr>
+          `;
+        }
+      }
+
+      function renderTable(standings) {
+        const tbody = document.getElementById("standings-body");
+        tbody.innerHTML = standings
+          .map(
+            (player, index) => {
+              // Show a small indicator for dependents
+              const isDependent = player.odataType === "dependent";
+              const nameDisplay = isDependent
+                ? `${player.username} <span class="dependent-indicator" title="Managed by ${player.parentName}">*</span>`
+                : player.username;
+
+              // Use display rank (index + 1) when sorted, otherwise use original rank
+              const displayRank = currentSort.field ? index + 1 : player.rank;
+
+              return `
+                <tr class="${isDependent ? 'dependent-row' : ''}">
+                  <td class="rank">${displayRank}</td>
+                  <td class="player">
+                    <div class="player-cell">
+                      ${getAvatarHtml({ profileImage: player.profileImage, displayName: player.username }, 32)}
+                      <span class="player-name">${nameDisplay}</span>
+                    </div>
+                  </td>
+                  <td class="points">${player.earnedPoints}</td>
+                  <td class="possible">${player.possiblePoints}</td>
+                  <td class="correct">${player.correctPicks}/${player.completedPicks}</td>
+                </tr>
+              `;
+            }
+          )
+          .join("");
+      }
+
+      function setupSortableHeaders() {
+        const headers = document.querySelectorAll('.standings-table th.sortable');
+        headers.forEach(header => {
+          header.addEventListener('click', () => {
+            const sortField = header.dataset.sort;
+            let sortOrder = header.dataset.order;
+
+            // Toggle order if same field clicked again
+            if (currentSort.field === sortField) {
+              sortOrder = currentSort.order === 'desc' ? 'asc' : 'desc';
+            } else {
+              sortOrder = 'desc'; // Default to descending for new field
+            }
+
+            currentSort = { field: sortField, order: sortOrder };
+
+            // Update header indicators
+            headers.forEach(h => {
+              h.classList.remove('sorted-asc', 'sorted-desc');
+              h.querySelector('.sort-indicator').textContent = '';
+            });
+            header.classList.add(sortOrder === 'desc' ? 'sorted-desc' : 'sorted-asc');
+            header.querySelector('.sort-indicator').textContent = sortOrder === 'desc' ? ' ▼' : ' ▲';
+
+            // Sort the data
+            const sorted = [...standingsData.standings].sort((a, b) => {
+              let aVal, bVal;
+              if (sortField === 'points') {
+                aVal = a.earnedPoints;
+                bVal = b.earnedPoints;
+              } else if (sortField === 'possible') {
+                aVal = a.possiblePoints;
+                bVal = b.possiblePoints;
+              }
+              return sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
+            });
+
+            renderTable(sorted);
+          });
+        });
+      }
+
+      function renderStandingsChart(standings, totalAvailablePoints) {
+        const ctx = document.getElementById('standingsChart').getContext('2d');
+
+        // Sort alphabetically by username
+        const sortedStandings = [...standings].sort((a, b) =>
+          a.username.localeCompare(b.username)
+        );
+
+        // Prepare data for vertical stacked bar chart
+        const labels = sortedStandings.map(p => p.username);
+        const earnedPoints = sortedStandings.map(p => p.earnedPoints);
+        const remainingPossible = sortedStandings.map(p => p.possiblePoints - p.earnedPoints);
+
+        // Plugin to draw max points horizontal line
+        const maxLinePlugin = {
+          id: 'maxLine',
+          afterDraw: (chart) => {
+            const ctx = chart.ctx;
+            const xAxis = chart.scales.x;
+            const yAxis = chart.scales.y;
+
+            const yPos = yAxis.getPixelForValue(totalAvailablePoints);
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#6b46c1';
+            ctx.lineWidth = 2;
+            ctx.moveTo(xAxis.left, yPos);
+            ctx.lineTo(xAxis.right, yPos);
+            ctx.stroke();
+
+            // Label for max line
+            ctx.fillStyle = '#6b46c1';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Max: ${totalAvailablePoints}`, xAxis.right + 5, yPos + 4);
+            ctx.restore();
+          }
+        };
+
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Points',
+                data: earnedPoints,
+                backgroundColor: '#6b46c1',
+                borderRadius: 4,
+              },
+              {
+                label: 'Possible',
+                data: remainingPossible,
+                backgroundColor: '#e2e8f0',
+                borderRadius: 4,
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+              padding: {
+                right: 60
+              }
+            },
+            plugins: {
+              legend: {
+                position: 'bottom',
+              },
+              title: {
+                display: true,
+                text: 'Standings',
+                font: {
+                  size: 18,
+                  weight: '600'
+                },
+                color: '#2d3748'
+              },
+              tooltip: {
+                callbacks: {
+                  afterBody: function(context) {
+                    const idx = context[0].dataIndex;
+                    const player = sortedStandings[idx];
+                    return `Total Possible: ${player.possiblePoints}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                stacked: true
+              },
+              y: {
+                stacked: true,
+                max: totalAvailablePoints,
+                title: {
+                  display: true,
+                  text: 'Points'
+                }
+              }
+            }
+          },
+          plugins: [maxLinePlugin]
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", initializePage);
+    </script>
+  </body>
+</html>

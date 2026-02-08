@@ -1,0 +1,162 @@
+/* Main container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Pool header */
+.pool-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 0 2rem;
+  border-bottom: 1px solid #6b46c1;
+  padding-bottom: 15px;
+}
+
+.pool-header h2 {
+  color: #2d3748;
+  font-size: 1.5em;
+  margin: 0;
+}
+
+/* Table container */
+.picks-table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Table styling */
+.picks-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Cell styling */
+.picks-table th,
+.picks-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.9em;
+}
+
+.picks-table th {
+  background: #f7fafc;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.picks-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Game styling */
+.game-matchup {
+  min-width: 200px;
+  font-weight: 500;
+}
+
+.game-info {
+  min-width: 200px;
+}
+
+.game-date {
+  width: 80px;
+  color: #718096;
+  font-size: 0.9em;
+}
+
+.game-round {
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.game-teams {
+  margin-top: 4px;
+}
+
+/* User picks styling */
+.user-pick {
+  text-align: center;
+  min-width: 120px;
+}
+
+.user-pick.current-user {
+  background-color: #f7fafc;
+  min-width: 120px;
+}
+
+.not-posted {
+  color: #a0aec0;
+  font-style: italic;
+  background: #f7fafc;
+}
+
+/* Pick details */
+.pick-team {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.pick-points {
+  color: #718096;
+  font-size: 0.9em;
+  display: block;
+}
+
+/* Round header styling */
+#roundHeader th {
+  background: #edf2f7;
+  color: #2d3748;
+  font-weight: 600;
+  text-align: left;
+  font-size: 1.1em;
+}
+
+.picks-table thead tr:last-child th {
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Points summary styling */
+.points-summary td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 8px;
+  text-align: center;
+}
+
+.points-detail {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.current-points {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.max-points {
+  color: #718096;
+  font-size: 0.9em;
+}
+
+/* Correct/Incorrect picks */
+.correct {
+  background-color: #f0fff4;
+}
+
+.incorrect {
+  background-color: #fff5f5;
+}

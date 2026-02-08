@@ -1,0 +1,633 @@
+/* ===========================================
+   PICKS PAGE STYLES
+   =========================================== */
+
+.picks-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.picks-container .page-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--color-primary);
+  text-align: center;
+}
+
+.picks-container .page-header h1 {
+  color: var(--color-text);
+  font-size: 1.75em;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.pool-subtitle {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+/* Picker Selector */
+.picker-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.picker-selector label {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.picker-selector select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--color-primary);
+  background: var(--color-white);
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.picker-selector select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.2);
+}
+
+.pool-header {
+  border-bottom: 1px solid var(--color-primary);
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+}
+
+.pool-header h2 {
+  color: var(--color-text);
+  font-size: var(--font-size-2xl);
+  margin: 0;
+}
+
+.your-picks-section {
+  margin-top: 30px;
+  padding: var(--spacing-lg);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: margin-top 0.3s ease;
+}
+
+.your-picks-section h3 {
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text);
+}
+
+.make-picks-title {
+  margin: 30px 0;
+  color: var(--color-text);
+}
+
+/* Game Section Cards */
+.game-section {
+  background: var(--color-white);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-primary);
+  width: calc(33.33% - 14px);
+  box-sizing: border-box;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+.game-section.active {
+  background-color: var(--color-background);
+}
+
+.game-section.picked {
+  background-color: #e9ecef;
+  pointer-events: none;
+}
+
+.game-section.picked .team-button:not(.selected) {
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .game-section {
+    width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 480px) {
+  .game-section {
+    width: 100%;
+  }
+}
+
+.game-header {
+  font-size: var(--font-size-xl);
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.game-info {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-md);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Team Selection */
+.team-selection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+  gap: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.team-button {
+  flex: 1;
+  padding: var(--spacing-sm);
+  margin: 0;
+  border: 3px solid transparent;
+  border-radius: var(--radius-md);
+  background-color: #f8f9fa;
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-button .team-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.team-button:hover {
+  background-color: #e9ecef;
+  transform: scale(1.02);
+}
+
+.team-button:hover .team-logo {
+  transform: scale(1.1);
+}
+
+.team-button.selected {
+  background-color: #e8f4f8;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.3);
+}
+
+.team-button.selected .team-logo {
+  transform: scale(1.05);
+}
+
+.team-button.selected:hover {
+  background-color: #d6eaf8;
+}
+
+.team-vs {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  flex: 0 0 auto;
+  margin: 0 var(--spacing-sm);
+}
+
+/* Points Display */
+.points-display {
+  text-align: center;
+  font-size: 2em;
+  margin: 10px 0;
+  color: var(--color-primary);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Slider */
+.slider-container {
+  padding: 15px 0;
+  margin: 10px 0 20px 0;
+  flex-shrink: 0;
+}
+
+.slider {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+  position: relative;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.slider-values {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
+  color: var(--color-text-muted);
+  font-size: 0.6em;
+  position: relative;
+  user-select: none;
+  pointer-events: none;
+}
+
+.slider-values span {
+  position: relative;
+  text-align: center;
+  min-width: 16px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.slider-values span.active {
+  font-size: 1.5em;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.slider-values span.used {
+  color: var(--color-text-muted);
+  font-weight: normal;
+  cursor: not-allowed;
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  transition: transform 0.05s;
+  z-index: 2;
+}
+
+.thumb:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.thumb:active {
+  cursor: grabbing;
+}
+
+@media (pointer: coarse) {
+  .thumb {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Save Pick Button */
+.save-pick {
+  margin-top: auto;
+  padding: 12px 20px;
+  background-color: #cbd5e0;
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: not-allowed;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  width: 100%;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 10;
+}
+
+.save-pick.enabled {
+  background-color: var(--color-success);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.save-pick.enabled:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+/* Picks List */
+.picks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.pick-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+}
+
+.pick-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Completed game states */
+.pick-item.correct {
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+}
+
+.pick-item.incorrect {
+  background: #fff5f5;
+  border-color: var(--color-error);
+}
+
+.pick-item.correct .pick-points {
+  color: var(--color-success);
+}
+
+.pick-item.incorrect .pick-points {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.pick-game-info {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pick-game-title {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+}
+
+.pick-teams {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.pick-team-selected {
+  flex: 1;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.pick-item.correct .pick-team-selected {
+  color: var(--color-success);
+}
+
+.pick-item.incorrect .pick-team-selected {
+  color: var(--color-error);
+  text-decoration: line-through;
+}
+
+.pick-points {
+  flex: 0 0 70px;
+  text-align: right;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Result indicators */
+.pick-result {
+  margin-left: 8px;
+  font-weight: 700;
+}
+
+.pick-result.correct {
+  color: var(--color-success);
+}
+
+.pick-result.incorrect {
+  color: var(--color-error);
+}
+
+.pick-summary {
+  flex-grow: 1;
+}
+
+.edit-pick-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+}
+
+.edit-pick-btn:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Alert Modal */
+.alert-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  text-align: center;
+}
+
+.alert-modal.error {
+  border-left: 4px solid var(--color-error);
+}
+
+.alert-modal:not(.error) {
+  border-left: 4px solid var(--color-success);
+}
+
+.alert-content {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+.close-alert {
+  margin-top: var(--spacing-sm);
+  padding: 8px 16px;
+  background: var(--color-error);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.close-alert:hover {
+  background: #c53030;
+}
+
+/* Success modal with actions */
+.alert-modal.success {
+  border-left: 4px solid var(--color-success);
+}
+
+.alert-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+.alert-button {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.alert-button.primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.alert-button.primary:hover {
+  background: #2c5282;
+}
+
+.alert-button.secondary {
+  background: #e2e8f0;
+  color: var(--color-text);
+}
+
+.alert-button.secondary:hover {
+  background: #cbd5e0;
+}
+
+.modal-overlay {
+  display: none;
+}
+
+/* Submit Button */
+#submit-all-button {
+  display: none;
+  margin: 30px auto;
+  padding: 15px 30px;
+  background-color: var(--color-success);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 200px;
+}
+
+#submit-all-button:hover {
+  background-color: #218838;
+}
+
+#submit-all-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+#submit-all-button.visible {
+  display: block;
+  margin: 20px auto;
+}
+
+/* Games Container */
+#games-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Locked State */
+.picks-container.locked {
+  pointer-events: none;
+}
+
+.picks-container.locked #games-container {
+  display: none;
+}
+
+.picks-container.locked .your-picks-section {
+  margin-top: 0;
+  opacity: 0.9;
+}
+
+/* Error State */
+.error {
+  color: var(--color-error);
+  text-align: center;
+  width: 100%;
+  padding: var(--spacing-lg);
+}
+
+/* Nav (Legacy) */
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+nav {
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+nav li {
+  margin: 0 10px;
+}
+
+nav a {
+  text-decoration: none;
+  color: var(--color-text);
+  padding: 15px 10px;
+  display: inline-block;
+}
+
+nav a.active {
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+nav a:hover {
+  color: var(--color-primary);
+}
