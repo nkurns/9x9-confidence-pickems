@@ -89,7 +89,7 @@
     <div id="hasPoolContent" class="auth-content" style="display: none">
       <div class="dashboard-hero">
         <div class="hero-overlay">
-          <h1>NFL Playoff Pool</h1>
+          <h1 id="heroPoolName">Confidence Pool</h1>
           <p>Track your picks, climb the standings</p>
         </div>
       </div>
@@ -272,6 +272,10 @@
           // Fetch picks status for the active pool (or first pool as fallback)
           if (poolData.pools.length > 0) {
             const activePool = poolData.pools.find(p => p.isActive) || poolData.pools[0];
+
+            // Update hero title with pool name
+            document.getElementById("heroPoolName").textContent = activePool.name || "Confidence Pool";
+
             const picksResponse = await fetch(
               `${API_URL}/api/picks/status/${activePool.poolId}`,
               {
@@ -479,20 +483,31 @@
                 const remainingPoints = userStanding.possiblePoints - userStanding.earnedPoints;
                 const maxPossible = userStanding.possiblePoints;
 
-                // Sort by maximum possible points to find rank
-                const sortedByMaxPossible = [...standingsData.standings].sort(
-                  (a, b) => b.possiblePoints - a.possiblePoints
-                );
-                const maxPossibleRank = sortedByMaxPossible.findIndex(
-                  s => s.odataId === currentUserId || s.odataId?.toString() === currentUserId
-                ) + 1;
-                document.getElementById("standingsSummary").innerHTML = `
-                  <div class="standings-info">
-                    <p class="standing-rank">You are currently in <strong>${getOrdinal(userStanding.rank)} place</strong> out of ${totalParticipants} participants with <strong>${userStanding.earnedPoints} points</strong>.</p>
-                    <p class="standing-remaining">With <strong>${remainingPoints} points</strong> remaining, your maximum possible is <strong>${maxPossible}</strong>, which is the <strong>${getOrdinal(maxPossibleRank)} highest</strong>.</p>
-                    <p class="standing-luck">Good luck!</p>
-                  </div>
-                `;
+                // Handle single participant case
+                if (totalParticipants === 1) {
+                  document.getElementById("standingsSummary").innerHTML = `
+                    <div class="standings-info">
+                      <p class="standing-rank">You have <strong>${userStanding.earnedPoints} points</strong> so far.</p>
+                      <p class="standing-remaining">With <strong>${remainingPoints} points</strong> remaining, your maximum possible is <strong>${maxPossible}</strong>.</p>
+                      <p class="standing-luck">Invite others to join the competition!</p>
+                    </div>
+                  `;
+                } else {
+                  // Sort by maximum possible points to find rank
+                  const sortedByMaxPossible = [...standingsData.standings].sort(
+                    (a, b) => b.possiblePoints - a.possiblePoints
+                  );
+                  const maxPossibleRank = sortedByMaxPossible.findIndex(
+                    s => s.odataId === currentUserId || s.odataId?.toString() === currentUserId
+                  ) + 1;
+                  document.getElementById("standingsSummary").innerHTML = `
+                    <div class="standings-info">
+                      <p class="standing-rank">You are currently in <strong>${getOrdinal(userStanding.rank)} place</strong> out of ${totalParticipants} participants with <strong>${userStanding.earnedPoints} points</strong>.</p>
+                      <p class="standing-remaining">With <strong>${remainingPoints} points</strong> remaining, your maximum possible is <strong>${maxPossible}</strong>, which is the <strong>${getOrdinal(maxPossibleRank)} highest</strong>.</p>
+                      <p class="standing-luck">Good luck!</p>
+                    </div>
+                  `;
+                }
               } else {
                 document.getElementById("standingsSummary").innerHTML = `
                   <p>Make your picks to see your standing!</p>
