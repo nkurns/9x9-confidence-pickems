@@ -62,7 +62,7 @@ class Auth {
       return true;
     } catch (error) {
       console.error("Token refresh failed:", error);
-      this.logout();
+      this.logoutUser();
       return false;
     }
   }

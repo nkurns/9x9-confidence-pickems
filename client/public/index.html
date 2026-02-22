@@ -179,22 +179,27 @@
 
       async function initializePage() {
         try {
-          await loadNavbar();
+          // Check auth state first (validates token, attempts refresh if expired)
+          const isAuth = await auth.checkAuthState();
 
-          const mainContent = document.querySelector(".main-content");
-          if (!mainContent) {
-            console.error("Main content container not found");
-            return;
+          // If not authenticated, clear any stale session data before rendering navbar
+          if (!isAuth) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
           }
 
+          // Load navbar after auth state is known so it renders correctly
+          await loadNavbar();
+
           // Check authentication and load appropriate content
-          if (auth.isAuthenticated()) {
+          if (isAuth) {
             await loadUserDashboard();
           } else {
             showGuestContent();
           }
         } catch (error) {
           console.error("Error initializing page:", error);
+          showGuestContent();
         }
       }
 
