@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Join Pool - 9X9 Playoff Pools</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/navbar.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <style>
+      .join-container {
+        max-width: 480px;
+        margin: 80px auto;
+        padding: 0 20px;
+        text-align: center;
+      }
+      .join-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        padding: 48px 40px;
+      }
+      .join-icon {
+        font-size: 3rem;
+        color: #4f8ef7;
+        margin-bottom: 20px;
+      }
+      .join-card h1 {
+        font-size: 1.6rem;
+        margin-bottom: 8px;
+        color: #1a1a2e;
+      }
+      .pool-name-highlight {
+        color: #4f8ef7;
+        font-weight: 700;
+      }
+      .join-card p {
+        color: #666;
+        margin-bottom: 32px;
+        font-size: 1rem;
+      }
+      .join-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .join-btn {
+        display: block;
+        padding: 14px 28px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: opacity 0.2s;
+      }
+      .join-btn:hover {
+        opacity: 0.88;
+      }
+      .join-btn-primary {
+        background: #4f8ef7;
+        color: #fff;
+      }
+      .join-btn-secondary {
+        background: #f0f4ff;
+        color: #4f8ef7;
+        border: 2px solid #4f8ef7;
+      }
+      .join-loading,
+      .join-error {
+        color: #666;
+        margin-top: 40px;
+      }
+      .join-error {
+        color: #e53e3e;
+      }
+      .join-success {
+        color: #38a169;
+        font-size: 1.1rem;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbarContainer"></div>
+
+    <div class="join-container">
+      <div id="joinLoading" class="join-loading">
+        <p>Loading invite...</p>
+      </div>
+
+      <div id="joinContent" class="join-card" style="display: none;">
+        <div class="join-icon"><i class="fas fa-trophy"></i></div>
+        <h1>You've been invited to join</h1>
+        <h2 class="pool-name-highlight" id="joinPoolName">—</h2>
+        <p>Sign up or sign in to start making confidence picks!</p>
+        <div class="join-actions" id="joinActions"></div>
+      </div>
+
+      <div id="joinError" class="join-card join-error" style="display: none;">
+        <i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:12px;"></i>
+        <p id="joinErrorMessage">This invite link is invalid or has expired.</p>
+        <a href="/" class="join-btn join-btn-secondary" style="margin-top:16px;">Go Home</a>
+      </div>
+    </div>
+
+    <script type="module">
+      import { loadNavbar } from "./src/loadNavbar.js";
+      import { API_URL } from "./src/config.js";
+      import auth from "./src/auth.js";
+
+      async function initializePage() {
+        await loadNavbar();
+
+        const params = new URLSearchParams(window.location.search);
+        const inviteCode = params.get("invite");
+
+        if (!inviteCode) {
+          showError("No invite code found in the link.");
+          return;
+        }
+
+        try {
+          const res = await fetch(`${API_URL}/api/pools/invite/${inviteCode}`);
+          if (!res.ok) {
+            showError("This invite link is invalid or the pool no longer exists.");
+            return;
+          }
+
+          const pool = await res.json();
+
+          // Check if already logged in
+          const isAuth = await auth.checkAuthState();
+          if (isAuth) {
+            // Auto-join then redirect
+            await autoJoin(inviteCode, pool.name);
+            return;
+          }
+
+          // Show invite UI for guests
+          document.getElementById("joinLoading").style.display = "none";
+          document.getElementById("joinPoolName").textContent = pool.name;
+          document.getElementById("joinContent").style.display = "block";
+
+          document.getElementById("joinActions").innerHTML = `
+            <a href="/register.html?invite=${inviteCode}" class="join-btn join-btn-primary">
+              <i class="fas fa-user-plus"></i> Create Account
+            </a>
+            <button class="join-btn join-btn-secondary" onclick="signInToJoin('${inviteCode}')">
+              <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+          `;
+        } catch (err) {
+          console.error("Error loading invite:", err);
+          showError("Something went wrong loading the invite. Please try again.");
+        }
+      }
+
+      async function autoJoin(inviteCode, poolName) {
+        try {
+          const token = localStorage.getItem("token");
+          const res = await fetch(`${API_URL}/api/pools/invite/${inviteCode}/join`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          document.getElementById("joinLoading").style.display = "none";
+          document.getElementById("joinContent").style.display = "block";
+          document.getElementById("joinPoolName").textContent = poolName;
+
+          if (res.ok) {
+            document.getElementById("joinActions").innerHTML = `
+              <p class="join-success"><i class="fas fa-check-circle"></i> You've joined the pool!</p>
+              <a href="/" class="join-btn join-btn-primary">Go to Dashboard</a>
+            `;
+          } else {
+            const data = await res.json();
+            // "Already in pool" is fine — just redirect
+            document.getElementById("joinActions").innerHTML = `
+              <p>${data.message || "You are already in this pool."}</p>
+              <a href="/" class="join-btn join-btn-primary">Go to Dashboard</a>
+            `;
+          }
+        } catch (err) {
+          console.error("Error auto-joining:", err);
+          showError("Failed to join the pool. Please try again.");
+        }
+      }
+
+      window.signInToJoin = function (inviteCode) {
+        localStorage.setItem("pendingInvite", inviteCode);
+        window.showLoginModal();
+      };
+
+      function showError(message) {
+        document.getElementById("joinLoading").style.display = "none";
+        document.getElementById("joinErrorMessage").textContent = message;
+        document.getElementById("joinError").style.display = "block";
+      }
+
+      document.addEventListener("DOMContentLoaded", initializePage);
+    </script>
+  </body>
+</html>

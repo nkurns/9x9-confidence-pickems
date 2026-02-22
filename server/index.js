@@ -12,6 +12,7 @@ const picksRoutes = require("./routes/picks");
 const participantRoutes = require("./routes/participants");
 const dashboardRoutes = require("./routes/dashboard");
 const standingsRoutes = require("./routes/standings");
+const tournamentCandidateRoutes = require("./routes/tournamentCandidates");
 
 const app = express();
 const PORT = process.env.PORT || 3333;
@@ -32,6 +33,7 @@ app.use("/api/picks", picksRoutes);
 app.use("/api/participants", participantRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/pool/standings", standingsRoutes);
+app.use("/api/tournament-candidates", tournamentCandidateRoutes);
 
 // Test route
 app.get("/test", (req, res) => {

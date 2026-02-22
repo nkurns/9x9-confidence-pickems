@@ -46,7 +46,14 @@
         </div>
       </section>
 
-      <section class="features-section">
+      <!-- Tournament Candidates (dynamic) — shown if any exist -->
+      <section id="tournamentCandidatesSection" class="features-section" style="display: none;">
+        <h2>Upcoming Tournaments</h2>
+        <div id="tournamentCandidatesGrid" class="features-grid"></div>
+      </section>
+
+      <!-- Static features fallback — shown if no candidates -->
+      <section id="staticFeaturesSection" class="features-section">
         <h2>Why Join Our Pool?</h2>
         <div class="features-grid">
           <div class="feature-card">
@@ -547,6 +554,46 @@
         document.getElementById("loggedOutContent").style.display = "block";
         document.getElementById("noPoolContent").style.display = "none";
         document.getElementById("hasPoolContent").style.display = "none";
+        loadTournamentCandidates();
+      }
+
+      async function loadTournamentCandidates() {
+        try {
+          const res = await fetch(`${API_URL}/api/tournament-candidates`);
+          if (!res.ok) return;
+          const candidates = await res.json();
+          if (!candidates.length) return;
+
+          const grid = document.getElementById("tournamentCandidatesGrid");
+          grid.innerHTML = candidates.map(c => {
+            const dateRange = formatDateRange(c.startDate, c.endDate);
+            return `
+              <div class="feature-card">
+                <i class="fas fa-trophy feature-icon"></i>
+                ${c.sport ? `<div style="font-size:0.8rem;color:#4f8ef7;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">${c.sport}</div>` : ""}
+                <h3>${c.name}</h3>
+                ${c.description ? `<p>${c.description}</p>` : ""}
+                ${dateRange ? `<p style="font-size:0.85rem;color:#888;">${dateRange}</p>` : ""}
+                <a href="register.html" style="display:inline-block;margin-top:12px;padding:8px 18px;background:#4f8ef7;color:#fff;border-radius:6px;text-decoration:none;font-size:0.9rem;font-weight:600;">Sign Up to Join</a>
+              </div>
+            `;
+          }).join("");
+
+          document.getElementById("tournamentCandidatesSection").style.display = "block";
+          document.getElementById("staticFeaturesSection").style.display = "none";
+        } catch (err) {
+          // On error, keep the static features section visible
+          console.log("Could not load tournament candidates:", err);
+        }
+      }
+
+      function formatDateRange(start, end) {
+        if (!start && !end) return "";
+        const fmt = d => new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+        if (start && end) return `${fmt(start)} – ${fmt(end)}`;
+        if (start) return `Starts ${fmt(start)}`;
+        if (end) return `Ends ${fmt(end)}`;
+        return "";
       }
 
       function showError(message) {

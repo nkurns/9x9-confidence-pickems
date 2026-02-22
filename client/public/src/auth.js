@@ -184,6 +184,22 @@ class Auth {
       // Close modal before redirect
       this.closeLoginModal();
 
+      // Handle pending invite (from join.html "Sign In" flow)
+      const pendingInvite = localStorage.getItem("pendingInvite");
+      if (pendingInvite) {
+        localStorage.removeItem("pendingInvite");
+        try {
+          await fetch(`${API_URL}/api/pools/invite/${pendingInvite}/join`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${data.token}` },
+          });
+        } catch (joinErr) {
+          console.error("Error joining pool via pending invite:", joinErr);
+        }
+        window.location.href = "/";
+        return;
+      }
+
       // Redirect based on pool participation
       if (!data.user.hasPoolParticipation) {
         console.log(

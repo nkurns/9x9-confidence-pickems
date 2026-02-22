@@ -1,9 +1,19 @@
 const express = require("express");
 const router = express.Router();
+const crypto = require("crypto");
 const Pool = require("../models/Pool");
 const Participant = require("../models/Participant");
 const auth = require("../middleware/auth");
 const poolAdmin = require("../middleware/poolAdmin");
+
+function generateInviteCode(poolName) {
+  const prefix = poolName
+    .slice(0, 4)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  const suffix = crypto.randomBytes(3).toString("hex");
+  return prefix ? `${prefix}-${suffix}` : suffix;
+}
 
 // Get active pool - this must come BEFORE the /:id route
 router.get("/active", auth, async (req, res) => {
@@ -104,7 +114,21 @@ router.get("/admin", auth, async (req, res) => {
   }
 });
 
-// Get pool by ID - this must come AFTER /active and /available
+// GET /api/pools/invite/:inviteCode — public, fetch pool info by invite code
+router.get("/invite/:inviteCode", async (req, res) => {
+  try {
+    const pool = await Pool.findOne({ inviteCode: req.params.inviteCode });
+    if (!pool) {
+      return res.status(404).json({ message: "Invite link not found" });
+    }
+    res.json({ _id: pool._id, name: pool.name, inviteCode: pool.inviteCode });
+  } catch (error) {
+    console.error("Error fetching pool by invite code:", error);
+    res.status(500).json({ message: "Error fetching pool" });
+  }
+});
+
+// Get pool by ID - this must come AFTER /active, /available, and /invite
 router.get("/:id", auth, async (req, res) => {
   try {
     const pool = await Pool.findById(req.params.id);
@@ -204,6 +228,55 @@ router.put("/:id", auth, poolAdmin, async (req, res) => {
   }
 });
 
+// POST /api/pools/invite/:inviteCode/join — auth required, join via invite
+router.post("/invite/:inviteCode/join", auth, async (req, res) => {
+  try {
+    const pool = await Pool.findOne({ inviteCode: req.params.inviteCode });
+    if (!pool) {
+      return res.status(404).json({ message: "Invite link not found" });
+    }
+
+    const participant = await Participant.findById(req.user.id);
+    if (!participant) {
+      return res.status(404).json({ message: "Participant not found" });
+    }
+
+    const alreadyJoined = participant.participatingPools.some(
+      (p) => p.poolId.toString() === pool._id.toString()
+    );
+
+    if (alreadyJoined) {
+      return res.json({ message: "Already in this pool", poolId: pool._id });
+    }
+
+    participant.participatingPools.push({ poolId: pool._id, joinedAt: new Date() });
+    await participant.save();
+
+    if (!pool.participants.includes(req.user.id)) {
+      pool.participants.push(req.user.id);
+      await pool.save();
+    }
+
+    res.json({ message: "Successfully joined pool", poolId: pool._id });
+  } catch (error) {
+    console.error("Error joining pool via invite:", error);
+    res.status(500).json({ message: "Error joining pool" });
+  }
+});
+
+// POST /api/pools/:id/invite-code — generate invite code for existing pool (admin only)
+router.post("/:id/invite-code", auth, poolAdmin, async (req, res) => {
+  try {
+    const pool = req.pool;
+    pool.inviteCode = generateInviteCode(pool.name);
+    await pool.save();
+    res.json({ inviteCode: pool.inviteCode });
+  } catch (error) {
+    console.error("Error generating invite code:", error);
+    res.status(500).json({ message: "Error generating invite code" });
+  }
+});
+
 // Create a new pool - creator becomes the admin
 router.post("/", auth, async (req, res) => {
   try {
@@ -218,6 +291,7 @@ router.post("/", auth, async (req, res) => {
       isActive: true,
       admin: req.user.id, // Creator becomes admin
       participants: [req.user.id], // Admin is automatically a participant
+      inviteCode: generateInviteCode(name),
     });
 
     await pool.save();

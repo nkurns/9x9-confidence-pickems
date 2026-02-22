@@ -73,6 +73,10 @@
           password: document.getElementById("passwordError"),
         };
 
+        // Check for invite code in URL
+        const params = new URLSearchParams(window.location.search);
+        const inviteCode = params.get("invite");
+
         registerForm.addEventListener("submit", async (e) => {
           e.preventDefault();
 
@@ -108,6 +112,19 @@
               localStorage.setItem("token", data.token);
               localStorage.setItem("user", JSON.stringify(data.user));
               sessionStorage.setItem("justRegistered", "true");
+
+              // If there's a pending invite, join the pool before redirecting
+              if (inviteCode) {
+                try {
+                  await fetch(`${API_URL}/api/pools/invite/${inviteCode}/join`, {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${data.token}` },
+                  });
+                } catch (joinErr) {
+                  console.error("Error joining pool via invite:", joinErr);
+                }
+              }
+
               window.location.href = "index.html";
             } else {
               // Show specific error messages

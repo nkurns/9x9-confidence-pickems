@@ -55,6 +55,11 @@ const PoolSchema = new mongoose.Schema(
       default: 13,
       min: [1, "Pool must have at least 1 game"],
     },
+    inviteCode: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
   },
   {
     timestamps: true,
