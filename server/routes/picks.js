@@ -253,7 +253,7 @@ router.get("/summary", auth, async (req, res) => {
     res.json({
       poolId: activePool._id,
       poolName: activePool.name,
-      round: activePool.round || "Wild Card Round",
+      round: activePool.round || "First Round",
       games: formattedGames,
       pickers, // New: list of all pickers (participants + dependents)
       pointsSummary,

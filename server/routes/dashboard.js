@@ -65,7 +65,7 @@ router.get("/", async (req, res) => {
     const dashboardData = {
       poolInfo: {
         name: activePool.name,
-        round: activePool.round || "Wild Card",
+        round: activePool.round || "First Round",
       },
       picksStatus: {
         submitted: userPicks.length,

@@ -28,6 +28,13 @@
   margin: 0;
 }
 
+.no-games-message {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+  padding: 40px 20px;
+}
+
 /* Picker Selector */
 .picker-selector {
   display: flex;

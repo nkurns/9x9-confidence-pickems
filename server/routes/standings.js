@@ -14,7 +14,7 @@ router.get("/", auth, async (req, res) => {
       return res.status(404).json({ message: "No active pool found" });
     }
 
-    // Get total games from pool config (default to 13 for NFL playoffs)
+    // Get total games from pool config (default to 15 for NBA playoffs)
     const totalGames = activePool.totalGames || 13;
 
     // Get all games for this pool

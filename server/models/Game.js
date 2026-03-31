@@ -9,7 +9,7 @@ const gameSchema = new mongoose.Schema({
   round: {
     type: String,
     required: true,
-    enum: ["Wild Card", "Divisional", "Conference", "Super Bowl"],
+    enum: ["First Round", "Second Round", "Conference Finals", "NBA Finals"],
   },
   gameTitle: {
     type: String,

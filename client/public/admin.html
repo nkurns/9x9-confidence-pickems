@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>9X9 NFL Playoff Pool - Admin</title>
+    <title>9X9 Playoff Pool - Admin</title>
     <link rel="stylesheet" href="styles/base.css" />
     <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/navbar.css" />
@@ -44,15 +44,15 @@
           <div class="form-row">
             <div class="form-group">
               <label for="gameTitle">Game Title</label>
-              <input type="text" id="gameTitle" placeholder="e.g., AFC Divisional Game 1" />
+              <input type="text" id="gameTitle" placeholder="e.g., Game 1 - First Round" />
             </div>
             <div class="form-group">
               <label for="gameRound">Round</label>
               <select id="gameRound">
-                <option value="Wild Card">Wild Card</option>
-                <option value="Divisional">Divisional</option>
-                <option value="Conference">Conference</option>
-                <option value="Super Bowl">Super Bowl</option>
+                <option value="First Round">First Round</option>
+                <option value="Second Round">Second Round</option>
+                <option value="Conference Finals">Conference Finals</option>
+                <option value="NBA Finals">NBA Finals</option>
               </select>
             </div>
           </div>
@@ -61,53 +61,39 @@
               <label for="homeTeam">Home Team</label>
               <select id="homeTeam">
                 <option value="">-- Select Team --</option>
-                <optgroup label="AFC East">
-                  <option value="Buffalo Bills">Buffalo Bills</option>
-                  <option value="Miami Dolphins">Miami Dolphins</option>
-                  <option value="New England Patriots">New England Patriots</option>
-                  <option value="New York Jets">New York Jets</option>
+                <optgroup label="Eastern Conference">
+                  <option value="Atlanta Hawks">Atlanta Hawks</option>
+                  <option value="Boston Celtics">Boston Celtics</option>
+                  <option value="Brooklyn Nets">Brooklyn Nets</option>
+                  <option value="Charlotte Hornets">Charlotte Hornets</option>
+                  <option value="Chicago Bulls">Chicago Bulls</option>
+                  <option value="Cleveland Cavaliers">Cleveland Cavaliers</option>
+                  <option value="Detroit Pistons">Detroit Pistons</option>
+                  <option value="Indiana Pacers">Indiana Pacers</option>
+                  <option value="Miami Heat">Miami Heat</option>
+                  <option value="Milwaukee Bucks">Milwaukee Bucks</option>
+                  <option value="New York Knicks">New York Knicks</option>
+                  <option value="Orlando Magic">Orlando Magic</option>
+                  <option value="Philadelphia 76ers">Philadelphia 76ers</option>
+                  <option value="Toronto Raptors">Toronto Raptors</option>
+                  <option value="Washington Wizards">Washington Wizards</option>
                 </optgroup>
-                <optgroup label="AFC North">
-                  <option value="Baltimore Ravens">Baltimore Ravens</option>
-                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
-                  <option value="Cleveland Browns">Cleveland Browns</option>
-                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
-                </optgroup>
-                <optgroup label="AFC South">
-                  <option value="Houston Texans">Houston Texans</option>
-                  <option value="Indianapolis Colts">Indianapolis Colts</option>
-                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
-                  <option value="Tennessee Titans">Tennessee Titans</option>
-                </optgroup>
-                <optgroup label="AFC West">
-                  <option value="Denver Broncos">Denver Broncos</option>
-                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
-                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
-                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
-                </optgroup>
-                <optgroup label="NFC East">
-                  <option value="Dallas Cowboys">Dallas Cowboys</option>
-                  <option value="New York Giants">New York Giants</option>
-                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
-                  <option value="Washington Commanders">Washington Commanders</option>
-                </optgroup>
-                <optgroup label="NFC North">
-                  <option value="Chicago Bears">Chicago Bears</option>
-                  <option value="Detroit Lions">Detroit Lions</option>
-                  <option value="Green Bay Packers">Green Bay Packers</option>
-                  <option value="Minnesota Vikings">Minnesota Vikings</option>
-                </optgroup>
-                <optgroup label="NFC South">
-                  <option value="Atlanta Falcons">Atlanta Falcons</option>
-                  <option value="Carolina Panthers">Carolina Panthers</option>
-                  <option value="New Orleans Saints">New Orleans Saints</option>
-                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
-                </optgroup>
-                <optgroup label="NFC West">
-                  <option value="Arizona Cardinals">Arizona Cardinals</option>
-                  <option value="Los Angeles Rams">Los Angeles Rams</option>
-                  <option value="San Francisco 49ers">San Francisco 49ers</option>
-                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                <optgroup label="Western Conference">
+                  <option value="Dallas Mavericks">Dallas Mavericks</option>
+                  <option value="Denver Nuggets">Denver Nuggets</option>
+                  <option value="Golden State Warriors">Golden State Warriors</option>
+                  <option value="Houston Rockets">Houston Rockets</option>
+                  <option value="Los Angeles Clippers">Los Angeles Clippers</option>
+                  <option value="Los Angeles Lakers">Los Angeles Lakers</option>
+                  <option value="Memphis Grizzlies">Memphis Grizzlies</option>
+                  <option value="Minnesota Timberwolves">Minnesota Timberwolves</option>
+                  <option value="New Orleans Pelicans">New Orleans Pelicans</option>
+                  <option value="Oklahoma City Thunder">Oklahoma City Thunder</option>
+                  <option value="Phoenix Suns">Phoenix Suns</option>
+                  <option value="Portland Trail Blazers">Portland Trail Blazers</option>
+                  <option value="Sacramento Kings">Sacramento Kings</option>
+                  <option value="San Antonio Spurs">San Antonio Spurs</option>
+                  <option value="Utah Jazz">Utah Jazz</option>
                 </optgroup>
               </select>
             </div>
@@ -115,53 +101,39 @@
               <label for="awayTeam">Away Team</label>
               <select id="awayTeam">
                 <option value="">-- Select Team --</option>
-                <optgroup label="AFC East">
-                  <option value="Buffalo Bills">Buffalo Bills</option>
-                  <option value="Miami Dolphins">Miami Dolphins</option>
-                  <option value="New England Patriots">New England Patriots</option>
-                  <option value="New York Jets">New York Jets</option>
+                <optgroup label="Eastern Conference">
+                  <option value="Atlanta Hawks">Atlanta Hawks</option>
+                  <option value="Boston Celtics">Boston Celtics</option>
+                  <option value="Brooklyn Nets">Brooklyn Nets</option>
+                  <option value="Charlotte Hornets">Charlotte Hornets</option>
+                  <option value="Chicago Bulls">Chicago Bulls</option>
+                  <option value="Cleveland Cavaliers">Cleveland Cavaliers</option>
+                  <option value="Detroit Pistons">Detroit Pistons</option>
+                  <option value="Indiana Pacers">Indiana Pacers</option>
+                  <option value="Miami Heat">Miami Heat</option>
+                  <option value="Milwaukee Bucks">Milwaukee Bucks</option>
+                  <option value="New York Knicks">New York Knicks</option>
+                  <option value="Orlando Magic">Orlando Magic</option>
+                  <option value="Philadelphia 76ers">Philadelphia 76ers</option>
+                  <option value="Toronto Raptors">Toronto Raptors</option>
+                  <option value="Washington Wizards">Washington Wizards</option>
                 </optgroup>
-                <optgroup label="AFC North">
-                  <option value="Baltimore Ravens">Baltimore Ravens</option>
-                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
-                  <option value="Cleveland Browns">Cleveland Browns</option>
-                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
-                </optgroup>
-                <optgroup label="AFC South">
-                  <option value="Houston Texans">Houston Texans</option>
-                  <option value="Indianapolis Colts">Indianapolis Colts</option>
-                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
-                  <option value="Tennessee Titans">Tennessee Titans</option>
-                </optgroup>
-                <optgroup label="AFC West">
-                  <option value="Denver Broncos">Denver Broncos</option>
-                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
-                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
-                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
-                </optgroup>
-                <optgroup label="NFC East">
-                  <option value="Dallas Cowboys">Dallas Cowboys</option>
-                  <option value="New York Giants">New York Giants</option>
-                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
-                  <option value="Washington Commanders">Washington Commanders</option>
-                </optgroup>
-                <optgroup label="NFC North">
-                  <option value="Chicago Bears">Chicago Bears</option>
-                  <option value="Detroit Lions">Detroit Lions</option>
-                  <option value="Green Bay Packers">Green Bay Packers</option>
-                  <option value="Minnesota Vikings">Minnesota Vikings</option>
-                </optgroup>
-                <optgroup label="NFC South">
-                  <option value="Atlanta Falcons">Atlanta Falcons</option>
-                  <option value="Carolina Panthers">Carolina Panthers</option>
-                  <option value="New Orleans Saints">New Orleans Saints</option>
-                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
-                </optgroup>
-                <optgroup label="NFC West">
-                  <option value="Arizona Cardinals">Arizona Cardinals</option>
-                  <option value="Los Angeles Rams">Los Angeles Rams</option>
-                  <option value="San Francisco 49ers">San Francisco 49ers</option>
-                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                <optgroup label="Western Conference">
+                  <option value="Dallas Mavericks">Dallas Mavericks</option>
+                  <option value="Denver Nuggets">Denver Nuggets</option>
+                  <option value="Golden State Warriors">Golden State Warriors</option>
+                  <option value="Houston Rockets">Houston Rockets</option>
+                  <option value="Los Angeles Clippers">Los Angeles Clippers</option>
+                  <option value="Los Angeles Lakers">Los Angeles Lakers</option>
+                  <option value="Memphis Grizzlies">Memphis Grizzlies</option>
+                  <option value="Minnesota Timberwolves">Minnesota Timberwolves</option>
+                  <option value="New Orleans Pelicans">New Orleans Pelicans</option>
+                  <option value="Oklahoma City Thunder">Oklahoma City Thunder</option>
+                  <option value="Phoenix Suns">Phoenix Suns</option>
+                  <option value="Portland Trail Blazers">Portland Trail Blazers</option>
+                  <option value="Sacramento Kings">Sacramento Kings</option>
+                  <option value="San Antonio Spurs">San Antonio Spurs</option>
+                  <option value="Utah Jazz">Utah Jazz</option>
                 </optgroup>
               </select>
             </div>
@@ -335,10 +307,10 @@
           <div class="form-group">
             <label for="editGameRound">Round</label>
             <select id="editGameRound">
-              <option value="Wild Card">Wild Card</option>
-              <option value="Divisional">Divisional</option>
-              <option value="Conference">Conference</option>
-              <option value="Super Bowl">Super Bowl</option>
+              <option value="First Round">First Round</option>
+              <option value="Second Round">Second Round</option>
+              <option value="Conference Finals">Conference Finals</option>
+              <option value="NBA Finals">NBA Finals</option>
             </select>
           </div>
           <div class="form-row">
@@ -346,53 +318,39 @@
               <label for="editHomeTeam">Home Team</label>
               <select id="editHomeTeam">
                 <option value="">-- Select Team --</option>
-                <optgroup label="AFC East">
-                  <option value="Buffalo Bills">Buffalo Bills</option>
-                  <option value="Miami Dolphins">Miami Dolphins</option>
-                  <option value="New England Patriots">New England Patriots</option>
-                  <option value="New York Jets">New York Jets</option>
+                <optgroup label="Eastern Conference">
+                  <option value="Atlanta Hawks">Atlanta Hawks</option>
+                  <option value="Boston Celtics">Boston Celtics</option>
+                  <option value="Brooklyn Nets">Brooklyn Nets</option>
+                  <option value="Charlotte Hornets">Charlotte Hornets</option>
+                  <option value="Chicago Bulls">Chicago Bulls</option>
+                  <option value="Cleveland Cavaliers">Cleveland Cavaliers</option>
+                  <option value="Detroit Pistons">Detroit Pistons</option>
+                  <option value="Indiana Pacers">Indiana Pacers</option>
+                  <option value="Miami Heat">Miami Heat</option>
+                  <option value="Milwaukee Bucks">Milwaukee Bucks</option>
+                  <option value="New York Knicks">New York Knicks</option>
+                  <option value="Orlando Magic">Orlando Magic</option>
+                  <option value="Philadelphia 76ers">Philadelphia 76ers</option>
+                  <option value="Toronto Raptors">Toronto Raptors</option>
+                  <option value="Washington Wizards">Washington Wizards</option>
                 </optgroup>
-                <optgroup label="AFC North">
-                  <option value="Baltimore Ravens">Baltimore Ravens</option>
-                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
-                  <option value="Cleveland Browns">Cleveland Browns</option>
-                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
-                </optgroup>
-                <optgroup label="AFC South">
-                  <option value="Houston Texans">Houston Texans</option>
-                  <option value="Indianapolis Colts">Indianapolis Colts</option>
-                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
-                  <option value="Tennessee Titans">Tennessee Titans</option>
-                </optgroup>
-                <optgroup label="AFC West">
-                  <option value="Denver Broncos">Denver Broncos</option>
-                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
-                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
-                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
-                </optgroup>
-                <optgroup label="NFC East">
-                  <option value="Dallas Cowboys">Dallas Cowboys</option>
-                  <option value="New York Giants">New York Giants</option>
-                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
-                  <option value="Washington Commanders">Washington Commanders</option>
-                </optgroup>
-                <optgroup label="NFC North">
-                  <option value="Chicago Bears">Chicago Bears</option>
-                  <option value="Detroit Lions">Detroit Lions</option>
-                  <option value="Green Bay Packers">Green Bay Packers</option>
-                  <option value="Minnesota Vikings">Minnesota Vikings</option>
-                </optgroup>
-                <optgroup label="NFC South">
-                  <option value="Atlanta Falcons">Atlanta Falcons</option>
-                  <option value="Carolina Panthers">Carolina Panthers</option>
-                  <option value="New Orleans Saints">New Orleans Saints</option>
-                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
-                </optgroup>
-                <optgroup label="NFC West">
-                  <option value="Arizona Cardinals">Arizona Cardinals</option>
-                  <option value="Los Angeles Rams">Los Angeles Rams</option>
-                  <option value="San Francisco 49ers">San Francisco 49ers</option>
-                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                <optgroup label="Western Conference">
+                  <option value="Dallas Mavericks">Dallas Mavericks</option>
+                  <option value="Denver Nuggets">Denver Nuggets</option>
+                  <option value="Golden State Warriors">Golden State Warriors</option>
+                  <option value="Houston Rockets">Houston Rockets</option>
+                  <option value="Los Angeles Clippers">Los Angeles Clippers</option>
+                  <option value="Los Angeles Lakers">Los Angeles Lakers</option>
+                  <option value="Memphis Grizzlies">Memphis Grizzlies</option>
+                  <option value="Minnesota Timberwolves">Minnesota Timberwolves</option>
+                  <option value="New Orleans Pelicans">New Orleans Pelicans</option>
+                  <option value="Oklahoma City Thunder">Oklahoma City Thunder</option>
+                  <option value="Phoenix Suns">Phoenix Suns</option>
+                  <option value="Portland Trail Blazers">Portland Trail Blazers</option>
+                  <option value="Sacramento Kings">Sacramento Kings</option>
+                  <option value="San Antonio Spurs">San Antonio Spurs</option>
+                  <option value="Utah Jazz">Utah Jazz</option>
                 </optgroup>
               </select>
             </div>
@@ -400,53 +358,39 @@
               <label for="editAwayTeam">Away Team</label>
               <select id="editAwayTeam">
                 <option value="">-- Select Team --</option>
-                <optgroup label="AFC East">
-                  <option value="Buffalo Bills">Buffalo Bills</option>
-                  <option value="Miami Dolphins">Miami Dolphins</option>
-                  <option value="New England Patriots">New England Patriots</option>
-                  <option value="New York Jets">New York Jets</option>
+                <optgroup label="Eastern Conference">
+                  <option value="Atlanta Hawks">Atlanta Hawks</option>
+                  <option value="Boston Celtics">Boston Celtics</option>
+                  <option value="Brooklyn Nets">Brooklyn Nets</option>
+                  <option value="Charlotte Hornets">Charlotte Hornets</option>
+                  <option value="Chicago Bulls">Chicago Bulls</option>
+                  <option value="Cleveland Cavaliers">Cleveland Cavaliers</option>
+                  <option value="Detroit Pistons">Detroit Pistons</option>
+                  <option value="Indiana Pacers">Indiana Pacers</option>
+                  <option value="Miami Heat">Miami Heat</option>
+                  <option value="Milwaukee Bucks">Milwaukee Bucks</option>
+                  <option value="New York Knicks">New York Knicks</option>
+                  <option value="Orlando Magic">Orlando Magic</option>
+                  <option value="Philadelphia 76ers">Philadelphia 76ers</option>
+                  <option value="Toronto Raptors">Toronto Raptors</option>
+                  <option value="Washington Wizards">Washington Wizards</option>
                 </optgroup>
-                <optgroup label="AFC North">
-                  <option value="Baltimore Ravens">Baltimore Ravens</option>
-                  <option value="Cincinnati Bengals">Cincinnati Bengals</option>
-                  <option value="Cleveland Browns">Cleveland Browns</option>
-                  <option value="Pittsburgh Steelers">Pittsburgh Steelers</option>
-                </optgroup>
-                <optgroup label="AFC South">
-                  <option value="Houston Texans">Houston Texans</option>
-                  <option value="Indianapolis Colts">Indianapolis Colts</option>
-                  <option value="Jacksonville Jaguars">Jacksonville Jaguars</option>
-                  <option value="Tennessee Titans">Tennessee Titans</option>
-                </optgroup>
-                <optgroup label="AFC West">
-                  <option value="Denver Broncos">Denver Broncos</option>
-                  <option value="Kansas City Chiefs">Kansas City Chiefs</option>
-                  <option value="Las Vegas Raiders">Las Vegas Raiders</option>
-                  <option value="Los Angeles Chargers">Los Angeles Chargers</option>
-                </optgroup>
-                <optgroup label="NFC East">
-                  <option value="Dallas Cowboys">Dallas Cowboys</option>
-                  <option value="New York Giants">New York Giants</option>
-                  <option value="Philadelphia Eagles">Philadelphia Eagles</option>
-                  <option value="Washington Commanders">Washington Commanders</option>
-                </optgroup>
-                <optgroup label="NFC North">
-                  <option value="Chicago Bears">Chicago Bears</option>
-                  <option value="Detroit Lions">Detroit Lions</option>
-                  <option value="Green Bay Packers">Green Bay Packers</option>
-                  <option value="Minnesota Vikings">Minnesota Vikings</option>
-                </optgroup>
-                <optgroup label="NFC South">
-                  <option value="Atlanta Falcons">Atlanta Falcons</option>
-                  <option value="Carolina Panthers">Carolina Panthers</option>
-                  <option value="New Orleans Saints">New Orleans Saints</option>
-                  <option value="Tampa Bay Buccaneers">Tampa Bay Buccaneers</option>
-                </optgroup>
-                <optgroup label="NFC West">
-                  <option value="Arizona Cardinals">Arizona Cardinals</option>
-                  <option value="Los Angeles Rams">Los Angeles Rams</option>
-                  <option value="San Francisco 49ers">San Francisco 49ers</option>
-                  <option value="Seattle Seahawks">Seattle Seahawks</option>
+                <optgroup label="Western Conference">
+                  <option value="Dallas Mavericks">Dallas Mavericks</option>
+                  <option value="Denver Nuggets">Denver Nuggets</option>
+                  <option value="Golden State Warriors">Golden State Warriors</option>
+                  <option value="Houston Rockets">Houston Rockets</option>
+                  <option value="Los Angeles Clippers">Los Angeles Clippers</option>
+                  <option value="Los Angeles Lakers">Los Angeles Lakers</option>
+                  <option value="Memphis Grizzlies">Memphis Grizzlies</option>
+                  <option value="Minnesota Timberwolves">Minnesota Timberwolves</option>
+                  <option value="New Orleans Pelicans">New Orleans Pelicans</option>
+                  <option value="Oklahoma City Thunder">Oklahoma City Thunder</option>
+                  <option value="Phoenix Suns">Phoenix Suns</option>
+                  <option value="Portland Trail Blazers">Portland Trail Blazers</option>
+                  <option value="Sacramento Kings">Sacramento Kings</option>
+                  <option value="San Antonio Spurs">San Antonio Spurs</option>
+                  <option value="Utah Jazz">Utah Jazz</option>
                 </optgroup>
               </select>
             </div>
@@ -884,7 +828,7 @@
               gameId,
               selectedTeam: pick.team,
               confidencePoints: pick.points,
-              round: game ? game.round : "Wild Card"
+              round: game ? game.round : "First Round"
             };
           });
 

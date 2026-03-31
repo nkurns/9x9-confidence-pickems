@@ -18,8 +18,8 @@ const PoolSchema = new mongoose.Schema(
     },
     round: {
       type: String,
-      enum: ["Wild Card", "Divisional", "Conference", "Super Bowl"],
-      default: "Wild Card",
+      enum: ["First Round", "Second Round", "Conference Finals", "NBA Finals"],
+      default: "First Round",
     },
     participants: {
       type: [

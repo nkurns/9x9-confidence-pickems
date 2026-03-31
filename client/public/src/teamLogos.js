@@ -1,66 +1,50 @@
-// NFL Team logo mappings
+// NBA Team logo mappings
 // Uses ESPN CDN for reliable, high-quality logos
 // Falls back to local files in /images/teams/ if needed
 
 // Team abbreviations for ESPN CDN URL pattern
 export const teamAbbreviationsForLogos = {
-  // AFC East
-  "Buffalo Bills": "buf",
-  "Miami Dolphins": "mia",
-  "New England Patriots": "ne",
-  "New York Jets": "nyj",
+  // Eastern Conference
+  "Atlanta Hawks":        "atl",
+  "Boston Celtics":       "bos",
+  "Brooklyn Nets":        "bkn",
+  "Charlotte Hornets":    "cha",
+  "Chicago Bulls":        "chi",
+  "Cleveland Cavaliers":  "cle",
+  "Detroit Pistons":      "det",
+  "Indiana Pacers":       "ind",
+  "Miami Heat":           "mia",
+  "Milwaukee Bucks":      "mil",
+  "New York Knicks":      "ny",
+  "Orlando Magic":        "orl",
+  "Philadelphia 76ers":   "phi",
+  "Toronto Raptors":      "tor",
+  "Washington Wizards":   "wsh",
 
-  // AFC North
-  "Baltimore Ravens": "bal",
-  "Cincinnati Bengals": "cin",
-  "Cleveland Browns": "cle",
-  "Pittsburgh Steelers": "pit",
-
-  // AFC South
-  "Houston Texans": "hou",
-  "Indianapolis Colts": "ind",
-  "Jacksonville Jaguars": "jax",
-  "Tennessee Titans": "ten",
-
-  // AFC West
-  "Denver Broncos": "den",
-  "Kansas City Chiefs": "kc",
-  "Las Vegas Raiders": "lv",
-  "Los Angeles Chargers": "lac",
-
-  // NFC East
-  "Dallas Cowboys": "dal",
-  "New York Giants": "nyg",
-  "Philadelphia Eagles": "phi",
-  "Washington Commanders": "wsh",
-
-  // NFC North
-  "Chicago Bears": "chi",
-  "Detroit Lions": "det",
-  "Green Bay Packers": "gb",
-  "Minnesota Vikings": "min",
-
-  // NFC South
-  "Atlanta Falcons": "atl",
-  "Carolina Panthers": "car",
-  "New Orleans Saints": "no",
-  "Tampa Bay Buccaneers": "tb",
-
-  // NFC West
-  "Arizona Cardinals": "ari",
-  "Los Angeles Rams": "lar",
-  "San Francisco 49ers": "sf",
-  "Seattle Seahawks": "sea",
+  // Western Conference
+  "Dallas Mavericks":         "dal",
+  "Denver Nuggets":           "den",
+  "Golden State Warriors":    "gs",
+  "Houston Rockets":          "hou",
+  "Los Angeles Clippers":     "lac",
+  "Los Angeles Lakers":       "lal",
+  "Memphis Grizzlies":        "mem",
+  "Minnesota Timberwolves":   "min",
+  "New Orleans Pelicans":     "no",
+  "Oklahoma City Thunder":    "okc",
+  "Phoenix Suns":             "phx",
+  "Portland Trail Blazers":   "por",
+  "Sacramento Kings":         "sac",
+  "San Antonio Spurs":        "sa",
+  "Utah Jazz":                "utah",
 };
 
 // Helper function to get logo URL for a team (uses ESPN CDN)
 export function getTeamLogoUrl(teamName, size = 100) {
   const abbrev = teamAbbreviationsForLogos[teamName];
   if (abbrev) {
-    // ESPN CDN URL pattern - sizes: 100, 500
-    return `https://a.espncdn.com/i/teamlogos/nfl/500/${abbrev}.png`;
+    return `https://a.espncdn.com/i/teamlogos/nba/500/${abbrev}.png`;
   }
-  // Return a placeholder if team not found
   return `/images/teams/placeholder.svg`;
 }
 
@@ -75,38 +59,36 @@ export function getTeamLogoUrlLocal(teamName) {
 
 // Helper function to get team abbreviation (for fallback display)
 export const teamAbbreviations = {
-  "Arizona Cardinals": "ARI",
-  "Atlanta Falcons": "ATL",
-  "Baltimore Ravens": "BAL",
-  "Buffalo Bills": "BUF",
-  "Carolina Panthers": "CAR",
-  "Chicago Bears": "CHI",
-  "Cincinnati Bengals": "CIN",
-  "Cleveland Browns": "CLE",
-  "Dallas Cowboys": "DAL",
-  "Denver Broncos": "DEN",
-  "Detroit Lions": "DET",
-  "Green Bay Packers": "GB",
-  "Houston Texans": "HOU",
-  "Indianapolis Colts": "IND",
-  "Jacksonville Jaguars": "JAX",
-  "Kansas City Chiefs": "KC",
-  "Las Vegas Raiders": "LV",
-  "Los Angeles Chargers": "LAC",
-  "Los Angeles Rams": "LAR",
-  "Miami Dolphins": "MIA",
-  "Minnesota Vikings": "MIN",
-  "New England Patriots": "NE",
-  "New Orleans Saints": "NO",
-  "New York Giants": "NYG",
-  "New York Jets": "NYJ",
-  "Philadelphia Eagles": "PHI",
-  "Pittsburgh Steelers": "PIT",
-  "San Francisco 49ers": "SF",
-  "Seattle Seahawks": "SEA",
-  "Tampa Bay Buccaneers": "TB",
-  "Tennessee Titans": "TEN",
-  "Washington Commanders": "WAS",
+  "Atlanta Hawks":        "ATL",
+  "Boston Celtics":       "BOS",
+  "Brooklyn Nets":        "BKN",
+  "Charlotte Hornets":    "CHA",
+  "Chicago Bulls":        "CHI",
+  "Cleveland Cavaliers":  "CLE",
+  "Detroit Pistons":      "DET",
+  "Indiana Pacers":       "IND",
+  "Miami Heat":           "MIA",
+  "Milwaukee Bucks":      "MIL",
+  "New York Knicks":      "NYK",
+  "Orlando Magic":        "ORL",
+  "Philadelphia 76ers":   "PHI",
+  "Toronto Raptors":      "TOR",
+  "Washington Wizards":   "WAS",
+  "Dallas Mavericks":     "DAL",
+  "Denver Nuggets":       "DEN",
+  "Golden State Warriors":"GSW",
+  "Houston Rockets":      "HOU",
+  "Los Angeles Clippers": "LAC",
+  "Los Angeles Lakers":   "LAL",
+  "Memphis Grizzlies":    "MEM",
+  "Minnesota Timberwolves":"MIN",
+  "New Orleans Pelicans": "NOP",
+  "Oklahoma City Thunder":"OKC",
+  "Phoenix Suns":         "PHX",
+  "Portland Trail Blazers":"POR",
+  "Sacramento Kings":     "SAC",
+  "San Antonio Spurs":    "SAS",
+  "Utah Jazz":            "UTA",
 };
 
 export function getTeamAbbreviation(teamName) {
