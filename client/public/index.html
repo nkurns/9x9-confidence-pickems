@@ -29,10 +29,7 @@
     <div id="loggedOutContent" class="guest-content">
       <section class="hero-section">
         <h1 class="hero-title">Welcome to 9X9 Playoff Pools!</h1>
-        <p class="hero-subtitle">
-          Enjoy the excitement of the playoffs with our unique confidence pool
-          format
-        </p>
+        <p class="hero-subtitle">Pick smart. Score big. Claim glory.</p>
         <div class="cta-buttons">
           <a href="register.html" class="cta-button cta-primary">
             Sign Up Now
@@ -96,8 +93,8 @@
     <div id="hasPoolContent" class="auth-content" style="display: none">
       <div class="dashboard-hero">
         <div class="hero-overlay">
-          <h1 id="heroPoolName">Confidence Pool</h1>
-          <p>Track your picks, climb the standings</p>
+          <h1>9X9 Playoff Pools</h1>
+          <p>Pick smart. Score big. Claim glory.</p>
         </div>
       </div>
       <div class="dashboard-container">
@@ -285,8 +282,7 @@
           if (poolData.pools.length > 0) {
             const activePool = poolData.pools.find(p => p.isActive) || poolData.pools[0];
 
-            // Update hero title with pool name
-            document.getElementById("heroPoolName").textContent = activePool.name || "Confidence Pool";
+            // Hero title is static — always shows app name, not a specific pool
 
             const picksResponse = await fetch(
               `${API_URL}/api/picks/status/${activePool.poolId}`,
