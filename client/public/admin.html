@@ -140,16 +140,17 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="gameTime">Series Start Date</label>
+              <label for="gameTime">Series Start Date <span style="color:#718096;font-weight:400;">(optional)</span></label>
               <input type="datetime-local" id="gameTime" />
             </div>
             <div class="form-group">
-              <label for="tvNetwork">TV Network</label>
+              <label for="tvNetwork">TV Network <span style="color:#718096;font-weight:400;">(optional)</span></label>
               <input type="text" id="tvNetwork" placeholder="e.g., CBS, FOX, NBC, ESPN" />
             </div>
           </div>
           <div class="form-actions">
-            <button class="btn btn-success" onclick="addGame()">Add Game</button>
+            <button class="btn btn-success" id="addSeriesBtn" onclick="addGame()">Add Series</button>
+            <span id="addSeriesFeedback" style="margin-left:12px;font-size:0.9em;"></span>
           </div>
         </div>
       </div>
@@ -490,7 +491,7 @@
         await loadParticipants();
       };
 
-      // Add Game
+      // Add Series
       window.addGame = async function() {
         const gameTitle = document.getElementById("gameTitle").value;
         const homeTeam = document.getElementById("homeTeam").value;
@@ -498,37 +499,43 @@
         const gameTime = document.getElementById("gameTime").value;
         const round = document.getElementById("gameRound").value;
         const tvNetwork = document.getElementById("tvNetwork").value;
+        const feedback = document.getElementById("addSeriesFeedback");
+        const btn = document.getElementById("addSeriesBtn");
 
-        if (!gameTitle || !homeTeam || !awayTeam || !gameTime) {
-          showAlert("Please fill in all required fields", "error");
+        if (!gameTitle || !homeTeam || !awayTeam) {
+          feedback.style.color = "#c53030";
+          feedback.textContent = "Series, Team 1, and Team 2 are required.";
           return;
         }
 
+        btn.disabled = true;
+        feedback.style.color = "#718096";
+        feedback.textContent = "Saving...";
+
         try {
           const token = localStorage.getItem("token");
+          const body = { gameTitle, homeTeam, awayTeam, round, poolId: currentPool._id };
+          if (gameTime) body.gameTime = gameTime;
+          if (tvNetwork) body.tvNetwork = tvNetwork;
+
           const response = await fetch(`${API_URL}/api/games`, {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-              gameTitle,
-              homeTeam,
-              awayTeam,
-              gameTime,
-              round,
-              tvNetwork,
-              poolId: currentPool._id
-            })
+            body: JSON.stringify(body)
           });
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to create game");
+            throw new Error(errorData.message || "Failed to create series");
           }
 
-          showAlert("Game added successfully!", "success");
+          feedback.style.color = "#276749";
+          feedback.textContent = `✓ "${gameTitle}" added successfully!`;
+          setTimeout(() => feedback.textContent = "", 4000);
+
           // Clear form
           document.getElementById("gameTitle").value = "";
           document.getElementById("homeTeam").selectedIndex = 0;
@@ -538,8 +545,11 @@
 
           await loadPoolAndGames();
         } catch (error) {
-          console.error("Error adding game:", error);
-          showAlert("Error adding game: " + error.message, "error");
+          console.error("Error adding series:", error);
+          feedback.style.color = "#c53030";
+          feedback.textContent = "Error: " + error.message;
+        } finally {
+          btn.disabled = false;
         }
       };
 

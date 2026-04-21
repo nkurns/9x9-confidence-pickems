@@ -25,11 +25,11 @@ const gameSchema = new mongoose.Schema({
   },
   startTime: {
     type: Date,
-    required: true,
+    required: false,
   },
   gameTime: {
     type: Date,
-    required: true,
+    required: false,
   },
   tvNetwork: {
     type: String,
