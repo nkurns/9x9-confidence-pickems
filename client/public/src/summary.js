@@ -84,7 +84,7 @@ class PicksSummary {
 
       // Add teams
       const teamsCell = document.createElement("td");
-      teamsCell.textContent = `${game.awayTeam} vs ${game.homeTeam}`;
+      teamsCell.textContent = `${game.homeTeam} vs ${game.awayTeam}`;
       row.appendChild(teamsCell);
 
       // Get picks for this game

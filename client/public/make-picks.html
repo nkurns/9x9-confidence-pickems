@@ -179,7 +179,7 @@
               pickItem.className = itemClasses;
 
               // Format teams display
-              const teamsDisplay = `${pick.awayTeam} @ ${pick.homeTeam}`;
+              const teamsDisplay = `${pick.homeTeam} vs ${pick.awayTeam}`;
 
               // Result indicator for completed games
               let resultIndicator = "";
@@ -721,7 +721,7 @@
               const picksList = document.querySelector(".picks-list");
               const pickItem = document.createElement("div");
               pickItem.className = "pick-item";
-              const teamsDisplay = `${gameInfo.awayTeam} @ ${gameInfo.homeTeam}`;
+              const teamsDisplay = `${gameInfo.homeTeam} vs ${gameInfo.awayTeam}`;
               pickItem.innerHTML = `
                 <div class="pick-game-info">
                   <span class="pick-game-title">${gameInfo.gameTitle}</span>

@@ -192,7 +192,7 @@ async function updateUpcomingGames() {
         return `
           <div class="game-item">
             <div class="game-date">${formattedDate} ET</div>
-            <div class="game-teams">${game.awayTeam} @ ${game.homeTeam}</div>
+            <div class="game-teams">${game.homeTeam} vs ${game.awayTeam}</div>
           </div>
         `;
       })

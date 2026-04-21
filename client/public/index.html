@@ -350,7 +350,7 @@
                       <h4 class="picks-group-title">Needs Picks</h4>
                       ${gamesNeedingPicks.map(game => `
                         <div class="dashboard-pick-item needs-pick">
-                          <span class="pick-team">${game.awayTeam} @ ${game.homeTeam}</span>
+                          <span class="pick-team">${game.homeTeam} vs ${game.awayTeam}</span>
                         </div>
                       `).join("")}
                     </div>
@@ -413,7 +413,7 @@
                       <h4 class="picks-group-title">Needs Picks</h4>
                       ${gamesNeedingPicks.map(game => `
                         <div class="dashboard-pick-item needs-pick">
-                          <span class="pick-team">${game.awayTeam} @ ${game.homeTeam}</span>
+                          <span class="pick-team">${game.homeTeam} vs ${game.awayTeam}</span>
                         </div>
                       `).join("")}
                     </div>
@@ -442,7 +442,7 @@
               gamesContent.innerHTML = upcomingGames
                 .map(game => `
                   <div class="game-item">
-                    <div class="game-matchup">${game.awayTeam} @ ${game.homeTeam}</div>
+                    <div class="game-matchup">${game.homeTeam} vs ${game.awayTeam}</div>
                     <div class="game-details">
                       <span class="game-date">${new Date(game.gameTime).toLocaleDateString()} ${new Date(game.gameTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                       <span class="game-network">${game.tvNetwork || ''}</span>
@@ -458,9 +458,9 @@
                     <div class="game-item completed">
                       <div class="game-title">${game.gameTitle}</div>
                       <div class="game-matchup">
-                        <span class="${game.winner === game.awayTeam ? 'winner' : ''}">${game.awayTeam}</span>
-                        <span class="at-symbol">@</span>
                         <span class="${game.winner === game.homeTeam ? 'winner' : ''}">${game.homeTeam}</span>
+                        <span class="vs-symbol">vs</span>
+                        <span class="${game.winner === game.awayTeam ? 'winner' : ''}">${game.awayTeam}</span>
                       </div>
                     </div>
                   `).join("")}

@@ -43,8 +43,8 @@
         <div class="add-game-form">
           <div class="form-row">
             <div class="form-group">
-              <label for="gameTitle">Game Title</label>
-              <input type="text" id="gameTitle" placeholder="e.g., Game 1 - First Round" />
+              <label for="gameTitle">Series</label>
+              <input type="text" id="gameTitle" placeholder="e.g., Celtics vs Heat" />
             </div>
             <div class="form-group">
               <label for="gameRound">Round</label>
@@ -58,7 +58,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="homeTeam">Home Team</label>
+              <label for="homeTeam">Team 1</label>
               <select id="homeTeam">
                 <option value="">-- Select Team --</option>
                 <optgroup label="Eastern Conference">
@@ -98,7 +98,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="awayTeam">Away Team</label>
+              <label for="awayTeam">Team 2</label>
               <select id="awayTeam">
                 <option value="">-- Select Team --</option>
                 <optgroup label="Eastern Conference">
@@ -140,7 +140,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="gameTime">Game Date/Time</label>
+              <label for="gameTime">Series Start Date</label>
               <input type="datetime-local" id="gameTime" />
             </div>
             <div class="form-group">
@@ -301,7 +301,7 @@
         <div class="modal-body">
           <input type="hidden" id="editGameId" />
           <div class="form-group">
-            <label for="editGameTitle">Game Title</label>
+            <label for="editGameTitle">Series</label>
             <input type="text" id="editGameTitle" />
           </div>
           <div class="form-group">
@@ -315,7 +315,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="editHomeTeam">Home Team</label>
+              <label for="editHomeTeam">Team 1</label>
               <select id="editHomeTeam">
                 <option value="">-- Select Team --</option>
                 <optgroup label="Eastern Conference">
@@ -355,7 +355,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="editAwayTeam">Away Team</label>
+              <label for="editAwayTeam">Team 2</label>
               <select id="editAwayTeam">
                 <option value="">-- Select Team --</option>
                 <optgroup label="Eastern Conference">
@@ -397,7 +397,7 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="editGameTime">Game Date/Time</label>
+              <label for="editGameTime">Series Start Date</label>
               <input type="datetime-local" id="editGameTime" />
             </div>
             <div class="form-group">
@@ -736,7 +736,7 @@
             return `
               <div class="proxy-game-item complete ${resultClass}" data-game-id="${game._id}" data-round="${game.round}">
                 <div class="game-title">${game.gameTitle} <span class="game-status-badge">Final</span></div>
-                <div class="game-matchup">${game.awayTeam} @ ${game.homeTeam}</div>
+                <div class="game-matchup">${game.homeTeam} vs ${game.awayTeam}</div>
                 <div class="pick-row locked">
                   <div class="locked-pick">
                     <span class="pick-team">${existingPick.team || 'No pick'}</span>
@@ -765,7 +765,7 @@
           return `
             <div class="proxy-game-item" data-game-id="${game._id}" data-round="${game.round}">
               <div class="game-title">${game.gameTitle}</div>
-              <div class="game-matchup">${game.awayTeam} @ ${game.homeTeam}</div>
+              <div class="game-matchup">${game.homeTeam} vs ${game.awayTeam}</div>
               <div class="pick-row">
                 <div class="team-select">
                   <select id="team-${game._id}" onchange="updateProxyPick('${game._id}')">
