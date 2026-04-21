@@ -222,3 +222,30 @@
   font-size: var(--font-size-sm);
   display: none;
 }
+
+/* Leave / Delete Pool Buttons */
+.btn-leave {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-leave:hover {
+  background-color: #cbd5e0;
+}
+
+.btn-leave.btn-delete {
+  background-color: #fed7d7;
+  color: #c53030;
+}
+
+.btn-leave.btn-delete:hover {
+  background-color: #feb2b2;
+}

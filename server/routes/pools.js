@@ -3,6 +3,8 @@ const router = express.Router();
 const crypto = require("crypto");
 const Pool = require("../models/Pool");
 const Participant = require("../models/Participant");
+const Game = require("../models/Game");
+const Pick = require("../models/Pick");
 const auth = require("../middleware/auth");
 const poolAdmin = require("../middleware/poolAdmin");
 
@@ -202,6 +204,30 @@ router.post("/:id/leave", auth, async (req, res) => {
   } catch (error) {
     console.error("Error leaving pool:", error);
     res.status(500).json({ message: "Error leaving pool" });
+  }
+});
+
+// Delete a pool (admin only) — cascades to games, picks, and participant records
+router.delete("/:id", auth, poolAdmin, async (req, res) => {
+  try {
+    const poolId = req.params.id;
+
+    // Remove all games and picks for this pool
+    await Game.deleteMany({ poolId });
+    await Pick.deleteMany({ poolId });
+
+    // Remove pool from all participants' participatingPools arrays
+    await Participant.updateMany(
+      { "participatingPools.poolId": poolId },
+      { $pull: { participatingPools: { poolId } } }
+    );
+
+    await Pool.findByIdAndDelete(poolId);
+
+    res.json({ message: "Pool deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting pool:", error);
+    res.status(500).json({ message: "Error deleting pool" });
   }
 });
 

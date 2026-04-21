@@ -23,6 +23,14 @@
         <p>Select the pools you'd like to join for the playoffs</p>
       </div>
 
+      <!-- My Pools Section -->
+      <div id="myPoolsSection" style="display:none; margin-bottom: 2rem;">
+        <h2>My Pools</h2>
+        <div id="myPoolsList" class="pools-list"></div>
+      </div>
+
+      <div class="section-divider" id="myPoolsDivider" style="display:none;"><span>JOIN MORE</span></div>
+
       <form id="poolsForm" onsubmit="handlePoolSubmit(event)">
         <div id="poolsList" class="pools-list">
           <!-- Pools will be loaded here dynamically -->
@@ -90,29 +98,30 @@
           return;
         }
 
+        const token = localStorage.getItem("token");
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        // Load user's current pools and available pools in parallel
         try {
-          console.log("Fetching available pools...");
-          const token = localStorage.getItem("token");
-          const response = await fetch(`${API_URL}/api/pools/available`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const [myPoolsRes, availableRes, adminPoolsRes] = await Promise.all([
+            fetch(`${API_URL}/api/participants/${user.id}/pools`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${API_URL}/api/pools/available`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${API_URL}/api/pools/admin`, { headers: { Authorization: `Bearer ${token}` } }),
+          ]);
 
-          console.log("Response status:", response.status);
+          const myPoolsData = myPoolsRes.ok ? await myPoolsRes.json() : { pools: [] };
+          const availablePools = availableRes.ok ? await availableRes.json() : [];
+          const adminPools = adminPoolsRes.ok ? await adminPoolsRes.json() : [];
 
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || "Failed to fetch pools");
-          }
+          const adminPoolIds = new Set(adminPools.map(p => p._id.toString()));
+          const myPoolIds = new Set((myPoolsData.pools || []).map(p => p.poolId.toString()));
 
-          const pools = await response.json();
+          // Display my pools section
+          displayMyPools(myPoolsData.pools || [], adminPoolIds);
 
-          if (!pools || !Array.isArray(pools)) {
-            throw new Error("Invalid pools data received");
-          }
-
-          displayPools(pools);
+          // Filter available pools to exclude ones already joined
+          const joinablePools = availablePools.filter(p => !myPoolIds.has(p._id.toString()));
+          displayPools(joinablePools);
         } catch (error) {
           console.error("Error fetching pools:", error);
           document.getElementById("poolsList").innerHTML = `
@@ -123,6 +132,83 @@
           `;
         }
       });
+
+      function displayMyPools(pools, adminPoolIds) {
+        if (!pools.length) return;
+
+        const section = document.getElementById("myPoolsSection");
+        const divider = document.getElementById("myPoolsDivider");
+        const list = document.getElementById("myPoolsList");
+
+        section.style.display = "block";
+        divider.style.display = "flex";
+
+        list.innerHTML = pools.map(pool => {
+          const isAdmin = adminPoolIds.has(pool.poolId.toString());
+          const actionBtn = isAdmin
+            ? `<button class="btn-leave btn-delete" onclick="handleDeletePool('${pool.poolId}', '${pool.name}')">Delete Pool</button>`
+            : `<button class="btn-leave" onclick="handleLeavePool('${pool.poolId}', '${pool.name}')">Leave Pool</button>`;
+
+          return `
+            <div class="pool-card" id="my-pool-${pool.poolId}">
+              <div class="pool-info">
+                <div class="pool-name">${pool.name}</div>
+                <div class="pool-details">
+                  <div class="pool-detail">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Joined: ${new Date(pool.joinedAt).toLocaleDateString()}</span>
+                  </div>
+                  <div class="pool-detail">
+                    <i class="fas fa-${isAdmin ? 'crown' : 'user'}"></i>
+                    <span>${isAdmin ? "Admin" : "Participant"}</span>
+                  </div>
+                </div>
+              </div>
+              ${actionBtn}
+            </div>
+          `;
+        }).join("");
+      }
+
+      window.handleLeavePool = async function(poolId, poolName) {
+        if (!confirm(`Leave "${poolName}"? You will need to rejoin to participate again.`)) return;
+        const token = localStorage.getItem("token");
+        try {
+          const res = await fetch(`${API_URL}/api/pools/${poolId}/leave`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) throw new Error((await res.json()).message);
+          document.getElementById(`my-pool-${poolId}`).remove();
+          const remaining = document.querySelectorAll("#myPoolsList .pool-card");
+          if (!remaining.length) {
+            document.getElementById("myPoolsSection").style.display = "none";
+            document.getElementById("myPoolsDivider").style.display = "none";
+          }
+        } catch (err) {
+          alert("Failed to leave pool: " + err.message);
+        }
+      };
+
+      window.handleDeletePool = async function(poolId, poolName) {
+        if (!confirm(`Permanently delete "${poolName}"? This will remove all games, picks, and participants. This cannot be undone.`)) return;
+        const token = localStorage.getItem("token");
+        try {
+          const res = await fetch(`${API_URL}/api/pools/${poolId}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) throw new Error((await res.json()).message);
+          document.getElementById(`my-pool-${poolId}`).remove();
+          const remaining = document.querySelectorAll("#myPoolsList .pool-card");
+          if (!remaining.length) {
+            document.getElementById("myPoolsSection").style.display = "none";
+            document.getElementById("myPoolsDivider").style.display = "none";
+          }
+        } catch (err) {
+          alert("Failed to delete pool: " + err.message);
+        }
+      };
 
       function displayPools(pools) {
         const poolsList = document.getElementById("poolsList");
