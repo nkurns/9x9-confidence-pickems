@@ -63,6 +63,7 @@ router.get("/active", auth, async (req, res) => {
       startDate: activePool.startDate,
       endDate: activePool.endDate,
       isActive: activePool.isActive,
+      totalGames: activePool.totalGames,
       joinedAt: participantPool.joinedAt,
     };
     console.log("Sending response:", response);

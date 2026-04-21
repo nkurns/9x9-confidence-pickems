@@ -436,6 +436,7 @@
 
           // Set totalGames so we know when all picks are made
           totalGames = gamesNeedingPicks.length;
+          const maxPoints = window.currentPool?.totalGames || totalGames;
 
           gamesNeedingPicks.forEach((game) => {
             const gameCard = document.createElement("div");
@@ -463,7 +464,7 @@
                 </div>
                 <div class="slider-values">
                   ${Array.from(
-                    { length: 14 },
+                    { length: maxPoints + 1 },
                     (_, i) => {
                       const isUsed = usedPoints.has(i);
                       const classes = [];
@@ -525,7 +526,7 @@
                   (adjustedX + edgePadding) / (sliderWidth + 2 * edgePadding)
                 )
               );
-              const rawPoints = percentage * 13;
+              const rawPoints = percentage * maxPoints;
               let points = Math.round(rawPoints);
 
               // If the point value is used, find the nearest available value
@@ -533,12 +534,12 @@
                 // Try to find nearest unused value
                 let lower = points - 1;
                 let upper = points + 1;
-                while (lower >= 0 || upper <= 13) {
+                while (lower >= 0 || upper <= maxPoints) {
                   if (lower >= 0 && !usedPoints.has(lower)) {
                     points = lower;
                     break;
                   }
-                  if (upper <= 13 && !usedPoints.has(upper)) {
+                  if (upper <= maxPoints && !usedPoints.has(upper)) {
                     points = upper;
                     break;
                   }
@@ -548,7 +549,7 @@
               }
 
               // Calculate the actual percentage for the thumb based on valid points
-              const actualPercentage = points / 13;
+              const actualPercentage = points / maxPoints;
 
               // Add debouncing for smoother updates
               clearTimeout(slider.updateTimeout);
