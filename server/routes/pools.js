@@ -64,6 +64,7 @@ router.get("/active", auth, async (req, res) => {
       endDate: activePool.endDate,
       isActive: activePool.isActive,
       totalGames: activePool.totalGames,
+      sport: activePool.sport,
       joinedAt: participantPool.joinedAt,
     };
     console.log("Sending response:", response);
@@ -307,13 +308,14 @@ router.post("/:id/invite-code", auth, poolAdmin, async (req, res) => {
 // Create a new pool - creator becomes the admin
 router.post("/", auth, async (req, res) => {
   try {
-    const { name, startDate, endDate, totalGames, entryFee } = req.body;
+    const { name, startDate, endDate, totalGames, entryFee, sport } = req.body;
 
     const pool = new Pool({
       name,
       startDate,
       endDate,
       totalGames: totalGames || 13,
+      sport: sport || "NBA",
       entryFee,
       isActive: true,
       admin: req.user.id, // Creator becomes admin

@@ -140,11 +140,11 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="gameTime">Series Start Date <span style="color:#718096;font-weight:400;">(optional)</span></label>
+              <label for="gameTime" id="gameTimeLabel">Series Start Date</label>
               <input type="datetime-local" id="gameTime" />
             </div>
             <div class="form-group">
-              <label for="tvNetwork">TV Network <span style="color:#718096;font-weight:400;">(optional)</span></label>
+              <label for="tvNetwork" id="tvNetworkLabel">TV Network</label>
               <input type="text" id="tvNetwork" placeholder="e.g., CBS, FOX, NBC, ESPN" />
             </div>
           </div>
@@ -481,6 +481,14 @@
 
       function updatePoolHeader() {
         document.getElementById("poolNameHeader").textContent = currentPool.name;
+        updateAddSeriesLabels();
+      }
+
+      function updateAddSeriesLabels() {
+        const isNFL = currentPool?.sport === "NFL";
+        const optional = ' <span style="color:#718096;font-weight:400;">(optional)</span>';
+        document.getElementById("gameTimeLabel").innerHTML = "Game Date/Time" + (isNFL ? "" : optional);
+        document.getElementById("tvNetworkLabel").innerHTML = "TV Network" + (isNFL ? "" : optional);
       }
 
       window.switchPool = async function() {
@@ -502,9 +510,12 @@
         const feedback = document.getElementById("addSeriesFeedback");
         const btn = document.getElementById("addSeriesBtn");
 
-        if (!gameTitle || !homeTeam || !awayTeam) {
+        const isNFL = currentPool?.sport === "NFL";
+        if (!gameTitle || !homeTeam || !awayTeam || (isNFL && !gameTime)) {
           feedback.style.color = "#c53030";
-          feedback.textContent = "Series, Team 1, and Team 2 are required.";
+          feedback.textContent = isNFL
+            ? "Series, Team 1, Team 2, and Game Date/Time are required."
+            : "Series, Team 1, and Team 2 are required.";
           return;
         }
 

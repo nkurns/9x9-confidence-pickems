@@ -50,6 +50,11 @@ const PoolSchema = new mongoose.Schema(
         message: "End date must be a valid date",
       },
     },
+    sport: {
+      type: String,
+      enum: ["NFL", "NBA", "NHL", "MLB"],
+      default: "NBA",
+    },
     totalGames: {
       type: Number,
       default: 13,

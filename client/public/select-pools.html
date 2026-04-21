@@ -61,9 +61,19 @@
           </div>
 
           <div class="form-row">
-            <label for="totalGames">Number of Games</label>
+            <label for="poolSport">Sport</label>
+            <select id="poolSport" onchange="handleSportChange()">
+              <option value="NBA">NBA</option>
+              <option value="NHL">NHL</option>
+              <option value="MLB">MLB</option>
+              <option value="NFL">NFL</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="totalGames">Number of Series</label>
             <input type="number" id="totalGames" value="15" min="1" max="30" required />
-            <small style="color: #718096; margin-top: 4px; display: block;">NBA Playoffs = 15 series</small>
+            <small id="totalGamesHint" style="color: #718096; margin-top: 4px; display: block;">NBA Playoffs = 15 series</small>
           </div>
 
           <div class="date-row">
@@ -344,6 +354,7 @@
         const totalGames = parseInt(document.getElementById("totalGames").value);
         const startDate = document.getElementById("startDate").value;
         const endDate = document.getElementById("endDate").value;
+        const sport = document.getElementById("poolSport").value;
         const submitButton = event.target.querySelector("button[type='submit']");
 
         // Validate dates
@@ -365,6 +376,7 @@
             },
             body: JSON.stringify({
               name: poolName,
+              sport,
               totalGames: totalGames,
               startDate: new Date(startDate).toISOString(),
               endDate: new Date(endDate).toISOString(),
@@ -408,6 +420,20 @@
           submitButton.disabled = false;
           submitButton.textContent = "Create Pool";
         }
+      };
+
+      const sportDefaults = {
+        NBA: { games: 15, hint: "NBA Playoffs = 15 series" },
+        NHL: { games: 15, hint: "NHL Playoffs = 15 series" },
+        MLB: { games: 10, hint: "MLB Playoffs = 10 series" },
+        NFL: { games: 11, hint: "NFL Playoffs = 11 games" },
+      };
+
+      window.handleSportChange = function() {
+        const sport = document.getElementById("poolSport").value;
+        const defaults = sportDefaults[sport];
+        document.getElementById("totalGames").value = defaults.games;
+        document.getElementById("totalGamesHint").textContent = defaults.hint;
       };
 
       // Set default dates (today and 2 weeks from now)

@@ -443,11 +443,10 @@
             gameCard.className = "game-section";
             gameCard.innerHTML = `
               <div class="game-header">${game.gameTitle}</div>
+              ${window.currentPool?.sport === 'NFL' && game.gameTime ? `
               <div class="game-info">
-                <sub>${new Date(game.gameTime).toLocaleString()} - ${
-              game.tvNetwork
-            }</sub>
-              </div>
+                <sub>${new Date(game.gameTime).toLocaleString()}${game.tvNetwork ? ' - ' + game.tvNetwork : ''}</sub>
+              </div>` : ''}
               <div class="team-selection">
                 <button class="team-button" data-team="${game.awayTeam}" title="${game.awayTeam}">
                   <img src="${window.getTeamLogoUrl(game.awayTeam)}" alt="${game.awayTeam}" class="team-logo">
