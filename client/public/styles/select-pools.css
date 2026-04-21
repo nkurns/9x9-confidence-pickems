@@ -223,6 +223,34 @@
   display: none;
 }
 
+/* Pool Status Badge */
+.pool-status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+.pool-status-badge.active {
+  background-color: #c6f6d5;
+  color: #276749;
+}
+
+.pool-status-badge.completed {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+/* Admin action button group */
+.pool-action-btns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 /* Leave / Delete Pool Buttons */
 .btn-leave {
   padding: 8px 16px;
@@ -239,6 +267,15 @@
 
 .btn-leave:hover {
   background-color: #cbd5e0;
+}
+
+.btn-leave.btn-complete {
+  background-color: #bee3f8;
+  color: #2b6cb0;
+}
+
+.btn-leave.btn-complete:hover {
+  background-color: #90cdf4;
 }
 
 .btn-leave.btn-delete {

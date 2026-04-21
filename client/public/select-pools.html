@@ -145,14 +145,21 @@
 
         list.innerHTML = pools.map(pool => {
           const isAdmin = adminPoolIds.has(pool.poolId.toString());
-          const actionBtn = isAdmin
-            ? `<button class="btn-leave btn-delete" onclick="handleDeletePool('${pool.poolId}', '${pool.name}')">Delete Pool</button>`
+          const statusBadge = pool.isActive
+            ? `<span class="pool-status-badge active">Active</span>`
+            : `<span class="pool-status-badge completed">Completed</span>`;
+
+          const actionBtns = isAdmin
+            ? `<div class="pool-action-btns">
+                ${pool.isActive ? `<button class="btn-leave btn-complete" onclick="handleCompletePool('${pool.poolId}', '${pool.name}')">Mark Complete</button>` : ''}
+                <button class="btn-leave btn-delete" onclick="handleDeletePool('${pool.poolId}', '${pool.name}')">Delete</button>
+               </div>`
             : `<button class="btn-leave" onclick="handleLeavePool('${pool.poolId}', '${pool.name}')">Leave Pool</button>`;
 
           return `
             <div class="pool-card" id="my-pool-${pool.poolId}">
               <div class="pool-info">
-                <div class="pool-name">${pool.name}</div>
+                <div class="pool-name">${pool.name} ${statusBadge}</div>
                 <div class="pool-details">
                   <div class="pool-detail">
                     <i class="fas fa-calendar-alt"></i>
@@ -164,11 +171,32 @@
                   </div>
                 </div>
               </div>
-              ${actionBtn}
+              ${actionBtns}
             </div>
           `;
         }).join("");
       }
+
+      window.handleCompletePool = async function(poolId, poolName) {
+        if (!confirm(`Mark "${poolName}" as completed? It will be preserved for historical reporting but removed from active pools.`)) return;
+        const token = localStorage.getItem("token");
+        try {
+          const res = await fetch(`${API_URL}/api/pools/${poolId}`, {
+            method: "PUT",
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ isActive: false }),
+          });
+          if (!res.ok) throw new Error((await res.json()).message);
+          // Update badge and remove Mark Complete button in place
+          const card = document.getElementById(`my-pool-${poolId}`);
+          card.querySelector(".pool-status-badge").className = "pool-status-badge completed";
+          card.querySelector(".pool-status-badge").textContent = "Completed";
+          const completeBtn = card.querySelector(".btn-complete");
+          if (completeBtn) completeBtn.remove();
+        } catch (err) {
+          alert("Failed to mark pool as complete: " + err.message);
+        }
+      };
 
       window.handleLeavePool = async function(poolId, poolName) {
         if (!confirm(`Leave "${poolName}"? You will need to rejoin to participate again.`)) return;
