@@ -46,6 +46,12 @@
         </div>
       </section>
 
+      <!-- Upcoming Series -->
+      <section id="guestGamesSection" class="features-section" style="display: none;">
+        <h2>Upcoming Series</h2>
+        <div id="guestGamesList" class="guest-games-list"></div>
+      </section>
+
       <!-- Tournament Candidates (dynamic) — shown if any exist -->
       <section id="tournamentCandidatesSection" class="features-section" style="display: none;">
         <h2>Upcoming Tournaments</h2>
@@ -553,7 +559,33 @@
         document.getElementById("loggedOutContent").style.display = "block";
         document.getElementById("noPoolContent").style.display = "none";
         document.getElementById("hasPoolContent").style.display = "none";
+        loadGuestGames();
         loadTournamentCandidates();
+      }
+
+      async function loadGuestGames() {
+        try {
+          const res = await fetch(`${API_URL}/api/games/public/upcoming`);
+          if (!res.ok) return;
+          const games = await res.json();
+          if (!games.length) return;
+
+          const list = document.getElementById("guestGamesList");
+          list.innerHTML = games.map(game => `
+            <div class="guest-game-card">
+              <div class="guest-game-matchup">${game.homeTeam} vs ${game.awayTeam}</div>
+              <div class="guest-game-meta">
+                <span class="guest-game-round">${game.round}</span>
+                ${game.gameTime ? `<span class="guest-game-date">${new Date(game.gameTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>` : ''}
+                ${game.tvNetwork ? `<span class="guest-game-network">${game.tvNetwork}</span>` : ''}
+              </div>
+            </div>
+          `).join("");
+
+          document.getElementById("guestGamesSection").style.display = "block";
+        } catch (err) {
+          console.log("Could not load guest games:", err);
+        }
       }
 
       async function loadTournamentCandidates() {

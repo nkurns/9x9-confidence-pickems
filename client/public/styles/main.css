@@ -943,3 +943,47 @@ nav ul li a:hover {
 .standings-info strong {
   color: #6b46c1;
 }
+
+/* Guest upcoming games */
+.guest-games-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.guest-game-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.guest-game-matchup {
+  font-weight: 600;
+  font-size: 0.95em;
+  color: #2d3748;
+  margin-bottom: 6px;
+}
+
+.guest-game-meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.78em;
+  color: #718096;
+}
+
+.guest-game-round {
+  background: #edf2f7;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.guest-game-date, .guest-game-network {
+  padding: 2px 4px;
+}

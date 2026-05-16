@@ -5,6 +5,29 @@ const Pool = require("../models/Pool");
 const Pick = require("../models/Pick");
 const auth = require("../middleware/auth");
 
+// Public: upcoming games that haven't started yet (no auth required)
+router.get("/public/upcoming", async (req, res) => {
+  try {
+    const activePool = await Pool.findOne({ isActive: true });
+    if (!activePool) return res.json([]);
+
+    const now = new Date();
+    const games = await Game.find({
+      poolId: activePool._id,
+      isComplete: false,
+      $or: [{ gameTime: { $gt: now } }, { gameTime: null }],
+    })
+      .sort({ gameTime: 1 })
+      .select("gameTitle homeTeam awayTeam gameTime round tvNetwork")
+      .lean();
+
+    res.json(games);
+  } catch (error) {
+    console.error("Error fetching public upcoming games:", error);
+    res.status(500).json({ message: "Error fetching games" });
+  }
+});
+
 // Get upcoming games
 router.get("/upcoming", auth, async (req, res) => {
   try {
