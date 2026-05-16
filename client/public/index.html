@@ -444,8 +444,8 @@
                   <div class="game-item">
                     <div class="game-matchup">${game.homeTeam} vs ${game.awayTeam}</div>
                     <div class="game-details">
-                      <span class="game-date">${new Date(game.gameTime).toLocaleDateString()} ${new Date(game.gameTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                      <span class="game-network">${game.tvNetwork || ''}</span>
+                      ${game.gameTime ? `<span class="game-date">${new Date(game.gameTime).toLocaleDateString()} ${new Date(game.gameTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>` : ''}
+                      ${game.tvNetwork ? `<span class="game-network">${game.tvNetwork}</span>` : ''}
                     </div>
                   </div>
                 `).join("");

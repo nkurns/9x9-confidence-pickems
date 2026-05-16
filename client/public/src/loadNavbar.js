@@ -58,6 +58,15 @@ export async function loadNavbar() {
       // Update active nav link
       updateActiveNavLink();
     }
+
+    // Inject footer if not already present
+    if (!document.getElementById("appFooter")) {
+      const footer = document.createElement("footer");
+      footer.id = "appFooter";
+      footer.innerHTML = `<p>&copy; ${new Date().getFullYear()} 9X9 Playoff Pools. All rights reserved.</p>`;
+      footer.style.cssText = "text-align:center;padding:16px;font-size:0.8em;color:#a0aec0;margin-top:40px;border-top:1px solid #e2e8f0;";
+      document.body.appendChild(footer);
+    }
   } catch (error) {
     console.error("Error loading navbar:", error);
   }

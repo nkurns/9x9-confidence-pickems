@@ -139,9 +139,15 @@ router.get("/summary", auth, async (req, res) => {
       return res.status(404).json({ message: "No active pool found" });
     }
 
-    // Get all games for the pool (newest first)
-    const games = await Game.find({ poolId: activePool._id }).sort({
-      gameTime: -1,
+    // Get all games for the pool, sorted by round (latest round first)
+    const roundOrder = { "NBA Finals": 4, "Conference Finals": 3, "Second Round": 2, "First Round": 1 };
+    const games = await Game.find({ poolId: activePool._id });
+    games.sort((a, b) => {
+      const rDiff = (roundOrder[b.round] || 0) - (roundOrder[a.round] || 0);
+      if (rDiff !== 0) return rDiff;
+      // Within same round, sort by gameTime if available
+      if (a.gameTime && b.gameTime) return new Date(b.gameTime) - new Date(a.gameTime);
+      return 0;
     });
 
     // Get all picks for these games

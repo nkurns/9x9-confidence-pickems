@@ -91,9 +91,10 @@
           document.getElementById("poolName").textContent = standingsData.poolName;
 
           // Update games stats
-          document.getElementById(
-            "gamesStats"
-          ).textContent = `${standingsData.completedGames} of ${standingsData.totalGames} games completed`;
+          const completedCount = standingsData.completedGames || 0;
+          const totalCount = standingsData.gamesCreated || standingsData.totalGames;
+          document.getElementById("gamesStats").textContent =
+            `${completedCount} of ${totalCount} series completed`;
 
           // Populate standings table
           if (!standingsData.standings || standingsData.standings.length === 0) {
@@ -102,6 +103,16 @@
                 <td colspan="5" class="no-data">No standings data available yet</td>
               </tr>
             `;
+            return;
+          }
+
+          if (completedCount === 0) {
+            document.getElementById("standings-body").innerHTML = `
+              <tr>
+                <td colspan="5" class="no-data">No series results have been posted yet — standings will update as results come in.</td>
+              </tr>
+            `;
+            setupSortableHeaders();
             return;
           }
 

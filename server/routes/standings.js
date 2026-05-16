@@ -82,13 +82,16 @@ router.get("/", auth, async (req, res) => {
       );
 
       const selfStats = calculateStandings(selfPicks);
-      standings.push({
-        odataId: participant._id,
-        odataType: "participant",
-        username: participant.displayName || participant.username,
-        profileImage: participant.profileImage,
-        ...selfStats
-      });
+      // Only include participants who have submitted picks
+      if (selfPicks.length > 0) {
+        standings.push({
+          odataId: participant._id,
+          odataType: "participant",
+          username: participant.displayName || participant.username,
+          profileImage: participant.profileImage,
+          ...selfStats
+        });
+      }
 
       // Add each dependent as a separate standings entry
       if (participant.dependents && participant.dependents.length > 0) {
@@ -99,16 +102,19 @@ router.get("/", auth, async (req, res) => {
                     pick.dependentId.toString() === dependent._id.toString()
           );
 
-          const dependentStats = calculateStandings(dependentPicks);
-          standings.push({
-            odataId: dependent._id,
-            odataType: "dependent",
-            parentId: participant._id,
-            parentName: participant.displayName || participant.username,
-            username: dependent.displayName,
-            profileImage: null, // Dependents don't have profile images
-            ...dependentStats
-          });
+          // Only include dependents who have submitted picks
+          if (dependentPicks.length > 0) {
+            const dependentStats = calculateStandings(dependentPicks);
+            standings.push({
+              odataId: dependent._id,
+              odataType: "dependent",
+              parentId: participant._id,
+              parentName: participant.displayName || participant.username,
+              username: dependent.displayName,
+              profileImage: null,
+              ...dependentStats
+            });
+          }
         });
       }
     });
